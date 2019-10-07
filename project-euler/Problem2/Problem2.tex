@@ -1,0 +1,19 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Project Euler Problem 2}
+\author{Brandon Roberts}
+\date{22 December 2018}
+
+\maketitle
+
+Find the sum of even fibonacci numbers less than 4 million.\\
+$S=\sum_{n} F_{n}[2|F_{n}][F_{n}<4000000]$ where $F_{n}$ is the nth fibonacci number.\\
+Note: odd+odd=even and even+even=even, but odd+even=odd.\\
+Looking at the small terms of fibonacci sequence we can see after $F_{n}=2$ we have the pattern odd, odd, even repeating. So thus any term of the form $F_{3m+2}$ is an even fibonacci number.\\
+I made a program with a single for loop in this folder that adds together, after calculating, terms of the fibonacci sequence of this form.\\
+Solution: 4613732
+
+\end{document}

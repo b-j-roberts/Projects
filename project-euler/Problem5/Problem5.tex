@@ -1,0 +1,28 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Project Euler Problem 5}
+\author{Brandon Roberts}
+\date{25 December 2018}
+
+\maketitle
+
+Find the least common multiple of the numbers 1-20.\\
+
+We know the least common multiple of any list of numbers is to take the max power of all primes in the prime factor decomposition of each of the numbers and multiply accordingly.\\
+ie or example uses the numbers 1 through 20\\
+\begin{align*}
+1&=1\\
+2&=2\\
+3&=3\\
+4&=2*2=2^{2}\\
+&\vdots\\
+20&=2*2*5=2^{2}*5\\
+\end{align*}
+so we see that the max power of each prime in the list less than or equal to 20 is as follows:
+max(2)=4, max(3)=2, max(other primes)=1.
+So our desired number $n$ is: $n=2^{4}*3^{2}*5^{1}*\dots*19^{1}$\\
+Solution: 232792560
+\end{document}

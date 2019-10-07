@@ -1,0 +1,21 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Project Euler Problem 6}
+\author{Brandon Roberts}
+\date{25 December 2018}
+
+\maketitle
+
+Find $S=(1+2+\dots+100)^{2}-(1^{2}+2^{2}+\dots+100^{2})$.
+We know the following:
+\begin{align*}
+\sum_{1\leq k\leq n} k&= \frac{n(n+1)}{2};\\
+\sum_{1\leq k\leq n} k^{2}&= \frac{n(n+1)(2n+1)}{6}
+\end{align*}
+through some simple calculations.\\
+Thus using $n=100$ and substitution we have $S=25502500-338350$.\\
+Solution: 25164150
+\end{document}

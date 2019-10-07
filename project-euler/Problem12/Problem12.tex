@@ -1,0 +1,20 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Project Euler Problem 12}
+\author{Brandon Roberts}
+\date{3 January 2019}
+
+\maketitle
+
+With inspiration from the equation:
+\begin{equation}
+d(n)=\prod_{p} (e_1+1)\dots(e_k+1)
+\end{equation}
+st $d(n)$ is the divisor function and $n=\prod_{p} p^{e_p}$ with k prime divisors.\\
+We know that we can decrease the size of our loop by decreasing the upper bound whenever a divisor was found, this shortened the code execution to give the valid solution.\\
+Solution:76576500.
+
+\end{document}
