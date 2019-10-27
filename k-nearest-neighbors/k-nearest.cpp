@@ -35,6 +35,8 @@ public:
  *
  *****************************/
 
+int min(int a, int b) { return a < b ? a : b; }
+
 // Metrics return a const value of the distance between the two point objects given
 template<typename T>
 const T metric(const Point<T>& p1, const Point<T>& p2);
@@ -53,6 +55,13 @@ const float metric<float>(const Point<float>& p1, const Point<float>& p2) {
   return sqrt( pow(p1.x() - p2.x(), 2) + pow(p1.y() - p2.y(), 2) );
 }
 
+
+/******************************
+ *
+ *    k-nearest functionality
+ *
+ ******************************/
+
 // Holds position and value of element of a vector
 template<typename T>
 struct pos_holder {
@@ -60,8 +69,6 @@ struct pos_holder {
   size_t pos;
   pos_holder(T val, int i): value(val), pos(i) { }
 };
-
-int min(int a, int b) { return a < b ? a : b; }
 
 // k_nearest returns a vector of the index of the k nearest neighbors in the given vector to a point passed
 template<typename T>
@@ -93,6 +100,7 @@ const std::vector<int> k_nearest(const std::vector<Point<T>>& points, size_t idx
    ret.erase(std::remove(ret.begin(), ret.end(), idx), ret.end());
    return ret;
 }
+
 
 int main() {
 
