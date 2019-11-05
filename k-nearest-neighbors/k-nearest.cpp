@@ -1,9 +1,12 @@
 #include <iostream> // Debugging headers
 
+#include <SFML/Graphics.hpp>
+
 #include <math.h>
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <stdexcept>
 
 template<typename T, typename L = std::string>
 class Point {
@@ -70,13 +73,14 @@ struct pos_holder {
   pos_holder(T val, int i): value(val), pos(i) { }
 };
 
-// k_nearest returns a vector of the index of the k nearest neighbors in the given vector to a point passed
+// k_nearest returns a vector of the index of the k nearest points to point in points
 template<typename T>
-const std::vector<int> k_nearest(const std::vector<Point<T>>& points, const Point<T>& point, size_t k) {  
-
+const std::vector<int> k_nearest(const std::vector<Point<T>>& points, 
+                                 const Point<T>& point, size_t k) {  
   // Get distances between all points and passed point
   std::vector<T> dist(points.size());
-  std::transform(points.begin(), points.end(), dist.begin(), [&](auto& p) { return metric(point, p); });
+  std::transform(points.begin(), points.end(), dist.begin(), 
+                 [&](auto& p) { return metric(point, p); });
 
   // Group distance with vector position then sort by distance
   std::vector<pos_holder<T>> pos;
@@ -93,7 +97,7 @@ const std::vector<int> k_nearest(const std::vector<Point<T>>& points, const Poin
   return ret;
 }
 
-// Does same thing as other k_nearest (see above) but for a point inside of the vector at position idx
+// Same as other k_nearest (see above) but for a point inside of the vector at position idx
 template<typename T>
 const std::vector<int> k_nearest(const std::vector<Point<T>>& points, size_t idx, size_t k) {
    auto ret = k_nearest(points, points[idx], k + 1);
@@ -102,9 +106,246 @@ const std::vector<int> k_nearest(const std::vector<Point<T>>& points, size_t idx
 }
 
 
+/*******************************
+ *
+ *
+ *     GUI FUNCTIONALITY
+ *
+ *
+ ******************************/
+
+class GUI_Toggle_Button {
+
+  sf::RectangleShape button_;
+  sf::Text label_;
+
+  bool active_;
+
+public:
+
+  void activate() {
+    active_ = true;
+    button_.setFillColor(sf::Color(0, 170, 0, 255));
+  }
+
+  void deactivate() {
+    active_ = false;
+    button_.setFillColor(sf::Color(170, 0, 0, 255));
+  }
+
+  bool is_active() { return active_; }
+
+  bool in_bounds(const sf::Vector2i& pos) {
+    sf::Vector2f position = button_.getPosition();
+    sf::Vector2f size = button_.getSize();
+    if(pos.x > position.x && pos.x < position.x + size.x &&
+       pos.y > position.y && pos.y < position.y + size.y) return true;
+    return false;
+  }
+
+  GUI_Toggle_Button(const sf::Vector2f& position, const sf::Vector2f& size, 
+                    const sf::Font& font, const std::string& label, bool act = false): 
+    active_(act) { 
+    
+    button_.setSize(size);
+    button_.setPosition(position);
+    if(act) button_.setFillColor(sf::Color(0, 170, 0, 255));
+    else    button_.setFillColor(sf::Color(170, 0, 0, 255));
+    button_.setOutlineColor(sf::Color(100, 100, 0, 255));
+    button_.setOutlineThickness(3);
+
+    label_.setFont(font);
+    label_.setString(label);
+    label_.setCharacterSize(size.x / label.length() * 1.5); // TO DO : max between height and side
+    label_.setFillColor(sf::Color::Black);
+    float x_orig = label_.getGlobalBounds().width / 2.f; 
+    float y_orig = label_.getGlobalBounds().height;
+    label_.setOrigin(x_orig, y_orig);
+    label_.setPosition(position.x + size.x / 2, position.y + size.y / 3); // TO DO: Figure this out
+  }
+
+  void draw(sf::RenderWindow& window) {
+    window.draw(button_);
+    window.draw(label_);
+  }
+
+};
+
+class GUI_Click_Button {
+
+  sf::RectangleShape button_;
+  sf::Text label_;
+
+public:
+
+  bool in_bounds(const sf::Vector2i& pos) {
+    sf::Vector2f position = button_.getPosition();
+    sf::Vector2f size = button_.getSize();
+    if(pos.x > position.x && pos.x < position.x + size.x &&
+       pos.y > position.y && pos.y < position.y + size.y) return true;
+    return false;
+  }
+
+  // TO DO : Slight color change to indicate click? 
+  
+  GUI_Click_Button(const sf::Vector2f& position, const sf::Vector2f& size,
+                   const sf::Font& font, const std::string& label) {
+
+    button_.setSize(size);
+    button_.setPosition(position);
+    button_.setFillColor(sf::Color(170, 0, 0, 255));
+    button_.setOutlineColor(sf::Color(100, 100, 0, 255));
+    button_.setOutlineThickness(3);
+
+    label_.setFont(font);
+    label_.setString(label);
+    label_.setCharacterSize(size.x / label.length() * 1.5); // TO DO : max between height and side
+    label_.setFillColor(sf::Color::Black);
+    float x_orig = label_.getGlobalBounds().width / 2.f;
+    float y_orig = label_.getGlobalBounds().height;
+    label_.setOrigin(x_orig, y_orig);
+    label_.setPosition(position.x + size.x / 2, position.y + size.y / 3); // TO DO: Figure this out
+  }
+
+  void draw(sf::RenderWindow& window) {
+    window.draw(button_);
+    window.draw(label_);
+  }
+
+};
+
+
 int main() {
 
+  // window
+  const sf::Vector2u window_size(1300, 1000);
+  sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "K-Nearest");
+  window.setFramerateLimit(60);
+
+  // GUI
+  
+  sf::Color eggshell = sf::Color(240, 234, 214, 255);
+  sf::Color gold = sf::Color(212, 175, 55);
+
+  sf::Font font;
+  if(!font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf")) {
+    throw std::runtime_error("No font file :""/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf"
+                             " found!");
+  }
+
+  sf::RectangleShape left_side_background(sf::Vector2f(994, 994));
+  left_side_background.setFillColor(eggshell);
+  left_side_background.setOutlineColor(sf::Color(100, 100, 0, 255));
+  left_side_background.setOutlineThickness(3);
+  left_side_background.setPosition(sf::Vector2f(3, 3));
+
+  sf::RectangleShape right_side_background(sf::Vector2f(294, 994));
+  right_side_background.setFillColor(gold);
+  right_side_background.setOutlineColor(sf::Color(100, 100, 0, 255));
+  right_side_background.setOutlineThickness(3);
+  right_side_background.setPosition(sf::Vector2f(1003, 3));
+
+  GUI_Toggle_Button int_mode_button(sf::Vector2f(1030, 50), sf::Vector2f(120, 100), font, "INT",  true);
+  GUI_Toggle_Button float_mode_button(sf::Vector2f(1150, 50), sf::Vector2f(120, 100), font, "FLOAT");
+
+  sf::RectangleShape k_background(sf::Vector2f(240, 100));
+  k_background.setFillColor(eggshell);
+  k_background.setOutlineColor(sf::Color(100, 100, 0, 255));
+  k_background.setOutlineThickness(3);
+  k_background.setPosition(sf::Vector2f(1030, 200));
+
+  GUI_Click_Button k_dec_button(sf::Vector2f(1030, 200), sf::Vector2f(50, 100), font, "D");
+  GUI_Click_Button k_inc_button(sf::Vector2f(1220, 200), sf::Vector2f(50, 100), font, "I");
+
+  GUI_Toggle_Button add_mode_button(sf::Vector2f(1030, 350), sf::Vector2f(70, 70), font, "A"); 
+  GUI_Toggle_Button del_mode_button(sf::Vector2f(1115, 350), sf::Vector2f(70, 70), font, "D"); 
+  GUI_Click_Button undo_button(sf::Vector2f(1200, 350), sf::Vector2f(70, 70), font, "U"); 
+
+  // TO DO :
+  //         current selected coordinates
+
+
+  // Initializations
   bool float_mode = false;
+  bool del_mode = false;
+  bool undo = false;
+  sf::Vector2i mouse_pos;
+
+  sf::Event event;
+
+  while(window.isOpen()) {
+
+    // INPUT
+    while(window.pollEvent(event)) {
+      switch(event.type) {
+      /*
+        case sf::Event::KeyPressed:
+          switch(event.key.code) {
+            case sf::Keyboard::W:
+              break;
+            // ...
+            default: break;
+          }
+          break; // key pressed
+       */
+          case sf::Event::Closed:
+            window.close();
+            break;
+
+          case sf::Event::MouseButtonPressed:
+            if(event.mouseButton.button == sf::Mouse::Left) {
+              mouse_pos = sf::Mouse::getPosition(window);
+              if(int_mode_button.in_bounds(mouse_pos)) {
+                int_mode_button.activate();
+                float_mode_button.deactivate();
+                float_mode = false;
+              } else if(float_mode_button.in_bounds(mouse_pos)) {
+                float_mode_button.activate();
+                int_mode_button.deactivate();
+                float_mode = true;
+              } else if(add_mode_button.in_bounds(mouse_pos)) {
+                add_mode_button.activate();
+                del_mode_button.deactivate();
+                del_mode = false;
+              } else if(del_mode_button.in_bounds(mouse_pos)) {
+                add_mode_button.deactivate();
+                del_mode_button.activate();
+                del_mode = true;
+              } else if(undo_button.in_bounds(mouse_pos)) {
+                undo = true;
+              }
+            }
+            break;
+
+        default: break;
+      }
+    } // end event loop
+
+    // UPDATE
+    
+
+    //DRAW
+    window.clear();
+
+    window.draw(left_side_background);
+    window.draw(right_side_background);
+
+    int_mode_button.draw(window);
+    float_mode_button.draw(window);
+
+    window.draw(k_background);
+    k_inc_button.draw(window);
+    k_dec_button.draw(window);
+
+    add_mode_button.draw(window);
+    del_mode_button.draw(window);
+    undo_button.draw(window);
+    
+    window.display();
+
+  } // end game loop
+
+  /*
   bool label_mode = false;
   int neighbors = 0;
   float radius;
@@ -148,6 +389,7 @@ int main() {
     // grid view
 
   }
+  */
 
   return 0;
 }
