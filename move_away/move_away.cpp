@@ -234,6 +234,11 @@ int main() {
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
       x += 2;
     }
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+      sf::Vector2i globalPosition = sf::Mouse::getPosition(window);
+      x = globalPosition.x;
+      y = globalPosition.y;
+    }
 
     // Update
 
