@@ -1,6 +1,6 @@
 #include <iostream> // Debugging headers
 
-#include <SFML/Graphics.hpp>
+#include "Harmony/SFML/GUI/gui.h"
 
 #include <math.h>
 #include <string>
@@ -87,6 +87,10 @@ const std::vector<int> k_nearest(const std::vector<Point<T>>& points,
   for(size_t i = 0, end = points.size(); i < end; ++i) {
     pos.emplace_back(dist[i], i);
   }
+  //std::transform(dist.begin(), dist.end(), std::back_inserter(pos), [i = 0](const auto& elem){
+  //    return pos_holder<T>(*elem, i++); };
+
+  // TO DO : Partial sort?
   std::sort(pos.begin(), pos.end(), [&](const pos_holder<T>& a,const pos_holder<T>& b) -> bool {
     return a.value < b.value;
   });
@@ -106,116 +110,9 @@ const std::vector<int> k_nearest(const std::vector<Point<T>>& points, size_t idx
 }
 
 
-/*******************************
- *
- *
- *     GUI FUNCTIONALITY
- *
- *
- ******************************/
-
-class GUI_Toggle_Button {
-
-  sf::RectangleShape button_;
-  sf::Text label_;
-
-  bool active_;
-
-public:
-
-  void activate() {
-    active_ = true;
-    button_.setFillColor(sf::Color(0, 170, 0, 255));
-  }
-
-  void deactivate() {
-    active_ = false;
-    button_.setFillColor(sf::Color(170, 0, 0, 255));
-  }
-
-  bool is_active() { return active_; }
-
-  bool in_bounds(const sf::Vector2i& pos) {
-    sf::Vector2f position = button_.getPosition();
-    sf::Vector2f size = button_.getSize();
-    if(pos.x > position.x && pos.x < position.x + size.x &&
-       pos.y > position.y && pos.y < position.y + size.y) return true;
-    return false;
-  }
-
-  GUI_Toggle_Button(const sf::Vector2f& position, const sf::Vector2f& size, 
-                    const sf::Font& font, const std::string& label, bool act = false): 
-    active_(act) { 
-    
-    button_.setSize(size);
-    button_.setPosition(position);
-    if(act) button_.setFillColor(sf::Color(0, 170, 0, 255));
-    else    button_.setFillColor(sf::Color(170, 0, 0, 255));
-    button_.setOutlineColor(sf::Color(100, 100, 0, 255));
-    button_.setOutlineThickness(3);
-
-    label_.setFont(font);
-    label_.setString(label);
-    label_.setCharacterSize(size.x / label.length() * 1.5); // TO DO : max between height and side
-    label_.setFillColor(sf::Color::Black);
-    float x_orig = label_.getGlobalBounds().width / 2.f; 
-    float y_orig = label_.getGlobalBounds().height;
-    label_.setOrigin(x_orig, y_orig);
-    label_.setPosition(position.x + size.x / 2, position.y + size.y / 3); // TO DO: Figure this out
-  }
-
-  void draw(sf::RenderWindow& window) {
-    window.draw(button_);
-    window.draw(label_);
-  }
-
-};
-
-class GUI_Click_Button {
-
-  sf::RectangleShape button_;
-  sf::Text label_;
-
-public:
-
-  bool in_bounds(const sf::Vector2i& pos) {
-    sf::Vector2f position = button_.getPosition();
-    sf::Vector2f size = button_.getSize();
-    if(pos.x > position.x && pos.x < position.x + size.x &&
-       pos.y > position.y && pos.y < position.y + size.y) return true;
-    return false;
-  }
-
-  // TO DO : Slight color change to indicate click? 
-  
-  GUI_Click_Button(const sf::Vector2f& position, const sf::Vector2f& size,
-                   const sf::Font& font, const std::string& label) {
-
-    button_.setSize(size);
-    button_.setPosition(position);
-    button_.setFillColor(sf::Color(170, 0, 0, 255));
-    button_.setOutlineColor(sf::Color(100, 100, 0, 255));
-    button_.setOutlineThickness(3);
-
-    label_.setFont(font);
-    label_.setString(label);
-    label_.setCharacterSize(size.x / label.length() * 1.5); // TO DO : max between height and side
-    label_.setFillColor(sf::Color::Black);
-    float x_orig = label_.getGlobalBounds().width / 2.f;
-    float y_orig = label_.getGlobalBounds().height;
-    label_.setOrigin(x_orig, y_orig);
-    label_.setPosition(position.x + size.x / 2, position.y + size.y / 3); // TO DO: Figure this out
-  }
-
-  void draw(sf::RenderWindow& window) {
-    window.draw(button_);
-    window.draw(label_);
-  }
-
-};
-
-
 int main() {
+
+  XInitThreads();
 
   // window
   const sf::Vector2u window_size(1300, 1000);
@@ -233,113 +130,127 @@ int main() {
                              " found!");
   }
 
-  sf::RectangleShape left_side_background(sf::Vector2f(994, 994));
-  left_side_background.setFillColor(eggshell);
-  left_side_background.setOutlineColor(sf::Color(100, 100, 0, 255));
-  left_side_background.setOutlineThickness(3);
-  left_side_background.setPosition(sf::Vector2f(3, 3));
+  GUI gui(window, font);
 
-  sf::RectangleShape right_side_background(sf::Vector2f(294, 994));
-  right_side_background.setFillColor(gold);
-  right_side_background.setOutlineColor(sf::Color(100, 100, 0, 255));
-  right_side_background.setOutlineThickness(3);
-  right_side_background.setPosition(sf::Vector2f(1003, 3));
+  Background back_1(1000, 1000, 0, 0, eggshell);
+  Background back_2(300, 1000, 1000, 0, gold);
+  gui.add_background(back_1, back_2);
 
-  GUI_Toggle_Button int_mode_button(sf::Vector2f(1030, 50), sf::Vector2f(120, 100), font, "INT",  true);
-  GUI_Toggle_Button float_mode_button(sf::Vector2f(1150, 50), sf::Vector2f(120, 100), font, "FLOAT");
+  Toggle_Button int_button(120, 100, 1030, 50, "INT");
+  Toggle_Button float_button(120, 100, 1150, 50, "FLOAT");
+  gui.add_toggle_button(int_button, float_button);
+  // TO DO : Link buttons
 
-  sf::RectangleShape k_background(sf::Vector2f(240, 100));
-  k_background.setFillColor(eggshell);
-  k_background.setOutlineColor(sf::Color(100, 100, 0, 255));
-  k_background.setOutlineThickness(3);
-  k_background.setPosition(sf::Vector2f(1030, 200));
+  // Neighbors GUI Part
+  int neighbors = 0;
+  Text_Display neighbors_label(240, 50, 1030, 200, "Neighbors", gold);
+  Text_Display k_value(140, 100, 1080, 250, std::to_string(neighbors));
+  gui.add_text(neighbors_label, k_value);
+  Push_Button k_decrease(50, 100, 1030, 250, "<");
+  Push_Button k_increase(50, 100, 1220, 250, ">");
+  gui.add_push_button(k_decrease, k_increase);
 
-  GUI_Click_Button k_dec_button(sf::Vector2f(1030, 200), sf::Vector2f(50, 100), font, "D");
-  GUI_Click_Button k_inc_button(sf::Vector2f(1220, 200), sf::Vector2f(50, 100), font, "I");
+  Toggle_Button add_mode(70, 70, 1030, 550, "A");
+  Toggle_Button del_mode(70, 70, 1115, 550, "D");
+  Toggle_Button sel_mode(70, 70, 1030, 670, "S");
+  gui.add_toggle_button(add_mode, del_mode, sel_mode);
+  Push_Button undo(70, 70, 1200, 550, "U");
+  gui.add_push_button(undo);
 
-  GUI_Toggle_Button add_mode_button(sf::Vector2f(1030, 350), sf::Vector2f(70, 70), font, "A"); 
-  GUI_Toggle_Button del_mode_button(sf::Vector2f(1115, 350), sf::Vector2f(70, 70), font, "D"); 
-  GUI_Click_Button undo_button(sf::Vector2f(1200, 350), sf::Vector2f(70, 70), font, "U"); 
+  // Left Side Interface
+  size_t box_size = 50;
+  size_t border_size = 1;
+  // [y][x]
+  std::vector<std::vector<bool>> active_positions(1000 / box_size, 
+                                                  std::vector<bool>(1000 / box_size, false));
+  sf::RectangleShape int_box(sf::Vector2f(box_size - 2 * border_size, box_size - 2 * border_size));
+  int_box.setOutlineThickness(border_size);
+  int_box.setOutlineColor(sf::Color::Black);
 
-  // TO DO :
-  //         current selected coordinates
-
+  sf::Vector2i selected(0, 0);
 
   // Initializations
-  bool float_mode = false;
-  bool del_mode = false;
-  bool undo = false;
-  sf::Vector2i mouse_pos;
-
   sf::Event event;
-
+  auto gui_state = gui.get_state();
   while(window.isOpen()) {
 
     // INPUT
     while(window.pollEvent(event)) {
       switch(event.type) {
-      /*
-        case sf::Event::KeyPressed:
-          switch(event.key.code) {
-            case sf::Keyboard::W:
-              break;
-            // ...
-            default: break;
-          }
-          break; // key pressed
-       */
-          case sf::Event::Closed:
-            window.close();
-            break;
-
-          case sf::Event::MouseButtonPressed:
-            if(event.mouseButton.button == sf::Mouse::Left) {
-              mouse_pos = sf::Mouse::getPosition(window);
-              if(int_mode_button.in_bounds(mouse_pos)) {
-                int_mode_button.activate();
-                float_mode_button.deactivate();
-                float_mode = false;
-              } else if(float_mode_button.in_bounds(mouse_pos)) {
-                float_mode_button.activate();
-                int_mode_button.deactivate();
-                float_mode = true;
-              } else if(add_mode_button.in_bounds(mouse_pos)) {
-                add_mode_button.activate();
-                del_mode_button.deactivate();
-                del_mode = false;
-              } else if(del_mode_button.in_bounds(mouse_pos)) {
-                add_mode_button.deactivate();
-                del_mode_button.activate();
-                del_mode = true;
-              } else if(undo_button.in_bounds(mouse_pos)) {
-                undo = true;
-              }
-            }
-            break;
+        case sf::Event::Closed:
+          window.close();
+          break;
 
         default: break;
       }
     } // end event loop
 
     // UPDATE
-    
+    gui_state = gui.get_state();
+    if(gui_state[k_increase()]) {
+      gui.set_text(k_value(), std::to_string(++neighbors));
+    }
+    if(gui_state[k_decrease()]) {
+      gui.set_text(k_value(), std::to_string(--neighbors));
+    }
+    if(gui_state[add_mode()]) {
+      if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        sf::Vector2i position = sf::Mouse::getPosition(window);
+        if(position.x < 1000 && position.y < 1000) {
+          if(!active_positions[position.y / box_size][position.x / box_size]) {
+            active_positions[position.y / box_size][position.x / box_size] = true;
+          }
+        }
+      }
+    }
+    if(gui_state[del_mode()]) {
+      if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        sf::Vector2i position = sf::Mouse::getPosition(window);
+        if(position.x < 1000 && position.y < 1000) {
+          if(active_positions[position.y / box_size][position.x / box_size]) {
+            active_positions[position.y / box_size][position.x / box_size] = false;
+          }
+        }
+      }
+    }
+    if(gui_state[sel_mode()]) {
+      if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        sf::Vector2i position = sf::Mouse::getPosition(window);
+        if(position.x < 1000 && position.y < 1000) {
+          selected = sf::Vector2i(position.x / box_size, position.y / box_size);
+        }
+      }
+      /*if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+        selected += sf::Vector2i(0, 1);
+      }*/
+    }
 
     //DRAW
     window.clear();
 
-    window.draw(left_side_background);
-    window.draw(right_side_background);
+    gui.draw(window);
 
-    int_mode_button.draw(window);
-    float_mode_button.draw(window);
-
-    window.draw(k_background);
-    k_inc_button.draw(window);
-    k_dec_button.draw(window);
-
-    add_mode_button.draw(window);
-    del_mode_button.draw(window);
-    undo_button.draw(window);
+    // Draw Grid
+    for(int i = 0; i < active_positions.size(); ++i) {
+      for(int j = 0; j < active_positions[i].size(); ++j) {
+        int_box.setPosition(j * box_size + border_size, i * box_size + border_size);
+        active_positions[i][j] ? int_box.setFillColor(sf::Color::Green) :
+                                 int_box.setFillColor(sf::Color::Red);
+        if(metric(Point(j, i), Point(selected.x, selected.y)) == 5) 
+          int_box.setFillColor(sf::Color::Yellow);
+        window.draw(int_box);
+      }
+    }
+    // Draw Selected Element ( fixes border issues )
+    int_box.setPosition(selected.x * box_size + border_size, selected.y * box_size + border_size);
+    active_positions[selected.y][selected.x] ? int_box.setFillColor(sf::Color::Green) :
+                                               int_box.setFillColor(sf::Color::Red);
+    int_box.setOutlineThickness(2 * border_size);
+    int_box.setOutlineColor(sf::Color::Yellow);
+    window.draw(int_box);
+    int_box.setOutlineThickness(border_size);
+    int_box.setOutlineColor(sf::Color::Black);
+    
     
     window.display();
 
@@ -347,7 +258,6 @@ int main() {
 
   /*
   bool label_mode = false;
-  int neighbors = 0;
   float radius;
 
   // Ability to toggle float mode, Resets
