@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string>
 #include <vector>
+#include <array>
 #include <algorithm>
 #include <stdexcept>
 
@@ -21,16 +22,23 @@ public:
   Point(T x, T y): x_(x), y_(y) { }
   Point(T x, T y, L label): x_(x), y_(y), label_(label) { }
 
-  Point(const Point& p) = default;
-  Point& operator= (const Point& p) = default;
+  Point(const Point& p) { x_ = p.x_; y_ = p.y_; }
+  Point& operator= (const Point& p) { x_ = p.x_; y_ = p.y_; }
 
   const T x() const { return x_; }
   const T y() const { return y_; } 
-
   const L& label() const { return label_; }
 
+  void move(T x, T y) { x_ += x; y_ += y; };
+
+  template<typename U>
+  friend bool operator==(const Point<U>& p_1, const Point<U>& p_2);
 };
 
+template<typename T>
+bool operator==(const Point<T>& p_1, const Point<T>& p_2) {
+  return p_1.x_ == p_2.x_ && p_1.y_ == p_2.y_;
+}
 
 /*****************************
  *
@@ -109,6 +117,34 @@ const std::vector<int> k_nearest(const std::vector<Point<T>>& points, size_t idx
    return ret;
 }
 
+enum undo_type { added, deleted, cleared };
+
+template<typename T>
+struct Undoable {
+
+  undo_type what;
+  std::vector<Point<T>> points;
+
+  Undoable(undo_type w, Point<T> p): what(w), points(1, p) { }
+  Undoable(undo_type w, std::vector<Point<T>> vec_p): what(w), points(vec_p) { }
+};
+
+const std::string Alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+std::string undoable_to_string(const Undoable<int>& u) {
+  switch(u.what) {
+    case added:
+      return "Added " + std::to_string(u.points[0].x()) + ":" + Alphas.substr(u.points[0].y()-1, 1);
+      break;
+    case deleted:
+      return "Deleted " + std::to_string(u.points[0].x()) + ":" + Alphas.substr(u.points[0].y()-1, 1);
+      break;
+    case cleared:
+      return "Cleared!";
+      break;
+  }
+  return "";
+}
 
 int main() {
 
@@ -132,7 +168,7 @@ int main() {
 
   GUI gui(window, font);
 
-  Background back_1(1000, 1000, 0, 0, eggshell);
+  Background back_1(1000, 1000, 0, 0, sf::Color::Black);
   Background back_2(300, 1000, 1000, 0, gold);
   gui.add_background(back_1, back_2);
 
@@ -150,33 +186,79 @@ int main() {
   Push_Button k_increase(50, 100, 1220, 250, ">");
   gui.add_push_button(k_decrease, k_increase);
 
-  Toggle_Button add_mode(70, 70, 1030, 550, "A");
-  Toggle_Button del_mode(70, 70, 1115, 550, "D");
-  Toggle_Button sel_mode(70, 70, 1030, 670, "S");
+  Toggle_Button add_mode(70, 70, 1030, 450, "A");
+  Toggle_Button del_mode(70, 70, 1115, 450, "D");
+  Toggle_Button sel_mode(70, 70, 1030, 570, "S");
   gui.add_toggle_button(add_mode, del_mode, sel_mode);
-  Push_Button undo(70, 70, 1200, 550, "U");
-  gui.add_push_button(undo);
+  Push_Button undo(70, 70, 1200, 450, "U");
+  Push_Button redo(70, 70, 1200, 570, "R");
+  Push_Button clear(70, 70, 1114, 570, "C");
+  gui.add_push_button(undo, redo, clear);
+
+  sf::Color undo_view_color(133, 133, 133);
+  std::array<Text_Display, 5> undo_view = { Text_Display(240, 50, 1030, 700, "", undo_view_color * sf::Color(0, 0, 0, 150)/*make text transparent*/),
+                                            Text_Display(240, 50, 1030, 760, "", undo_view_color),
+                                            Text_Display(240, 50, 1030, 820, "", undo_view_color),
+                                            Text_Display(240, 50, 1030, 880, "", undo_view_color),
+                                            Text_Display(240, 50, 1030, 940, "", undo_view_color) };
+  for(auto& elem : undo_view) { gui.add_text(elem); }
 
   // Left Side Interface
-  size_t box_size = 50;
-  size_t border_size = 1;
+  int box_size = 50;
+  int border_size = 1;
   // [y][x]
   std::vector<std::vector<bool>> active_positions(1000 / box_size, 
                                                   std::vector<bool>(1000 / box_size, false));
   sf::RectangleShape int_box(sf::Vector2f(box_size - 2 * border_size, box_size - 2 * border_size));
-  int_box.setOutlineThickness(border_size);
-  int_box.setOutlineColor(sf::Color::Black);
+  int_box.setOutlineColor(sf::Color::Yellow);
 
-  sf::Vector2i selected(0, 0);
+  std::vector<Text_Display> horz_label;
+  std::vector<Text_Display> vert_label;
+  for(int i = 1; i < 1000 / box_size; ++i) {
+    horz_label.emplace_back(box_size - 2 * border_size, box_size - 2 * border_size, 
+                            i * box_size + border_size, border_size, std::to_string(i));
+    vert_label.emplace_back(box_size - 2 * border_size, box_size - 2 * border_size, 
+                            border_size, i * box_size + border_size, Alphas.substr(i - 1, 1));
+    gui.add_text(horz_label[i - 1]);
+    gui.add_text(vert_label[i - 1]);
+  }
+
+  Point<int> selected(0, 0);
+  std::vector<Point<int>> points;
+
+  std::vector<Undoable<int>> undo_vec;
+  int undo_pos = -1;
 
   // Initializations
   sf::Event event;
-  auto gui_state = gui.get_state();
   while(window.isOpen()) {
 
     // INPUT
     while(window.pollEvent(event)) {
       switch(event.type) {
+        case sf::Event::KeyPressed:
+          switch(event.key.code) {
+            case sf::Keyboard::Down:
+              if(selected.y() + 1 < active_positions.size()) selected.move(0, 1);
+              break;
+            case sf::Keyboard::Up:
+              if(selected.y() - 1 >= 0) selected.move(0, -1);
+              break;
+            case sf::Keyboard::Right:
+              if(selected.x() + 1 < active_positions[0].size()) selected.move(1, 0);
+              break;
+            case sf::Keyboard::Left:
+              if(selected.x() - 1 >= 0) selected.move(-1, 0);
+              break;
+            case sf::Keyboard::N:
+              gui.set_text(k_value(), std::to_string(++neighbors));
+              break;
+            case sf::Keyboard::B:
+              if(neighbors > 0) gui.set_text(k_value(), std::to_string(--neighbors));
+              break;
+            default: break;
+          }
+          break;
         case sf::Event::Closed:
           window.close();
           break;
@@ -185,44 +267,124 @@ int main() {
       }
     } // end event loop
 
-    // UPDATE
-    gui_state = gui.get_state();
+    auto gui_state = gui.get_state();
     if(gui_state[k_increase()]) {
       gui.set_text(k_value(), std::to_string(++neighbors));
     }
     if(gui_state[k_decrease()]) {
-      gui.set_text(k_value(), std::to_string(--neighbors));
+      if(neighbors > 0) gui.set_text(k_value(), std::to_string(--neighbors));
     }
     if(gui_state[add_mode()]) {
       if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        sf::Vector2i position = sf::Mouse::getPosition(window);
-        if(position.x < 1000 && position.y < 1000) {
-          if(!active_positions[position.y / box_size][position.x / box_size]) {
-            active_positions[position.y / box_size][position.x / box_size] = true;
+        sf::Vector2i position = sf::Mouse::getPosition(window) / box_size;
+        if(position.x < active_positions[0].size() && position.x > 0 &&
+           position.y < active_positions.size() && position.y > 0) {
+          if(!active_positions[position.y][position.x]) {
+            active_positions[position.y][position.x] = true;
+            points.emplace_back(position.x, position.y);
+            undo_vec.erase(undo_vec.begin() + undo_pos + 1, undo_vec.end());
+            undo_vec.emplace_back(added, *(points.end() - 1));
+            ++undo_pos;
           }
         }
       }
     }
     if(gui_state[del_mode()]) {
       if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        sf::Vector2i position = sf::Mouse::getPosition(window);
-        if(position.x < 1000 && position.y < 1000) {
-          if(active_positions[position.y / box_size][position.x / box_size]) {
-            active_positions[position.y / box_size][position.x / box_size] = false;
+        sf::Vector2i position = sf::Mouse::getPosition(window) / box_size;
+        if(position.x < active_positions[0].size() && position.x > 0 &&
+           position.y < active_positions.size() && position.y > 0) {
+          if(active_positions[position.y][position.x]) {
+            undo_vec.erase(undo_vec.begin() + undo_pos + 1, undo_vec.end());
+            undo_vec.emplace_back(deleted, Point<int>(position.x, position.y));
+            ++undo_pos;
+            active_positions[position.y][position.x] = false;
+            points.erase(std::remove(points.begin(), points.end(), 
+                                     Point<int>(position.x, position.y)), points.end());
           }
         }
       }
     }
     if(gui_state[sel_mode()]) {
       if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        sf::Vector2i position = sf::Mouse::getPosition(window);
-        if(position.x < 1000 && position.y < 1000) {
-          selected = sf::Vector2i(position.x / box_size, position.y / box_size);
+        sf::Vector2i position = sf::Mouse::getPosition(window) / box_size;
+        if(position.x < active_positions[0].size() && position.x > 0 &&
+           position.y < active_positions.size() && position.y > 0) {
+          auto p = Point<int>(position.x, position.y);
+          selected = p;
         }
       }
-      /*if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-        selected += sf::Vector2i(0, 1);
-      }*/
+    }
+    if(gui_state[clear()]) {
+      undo_vec.erase(undo_vec.begin() + undo_pos + 1, undo_vec.end());
+      undo_vec.emplace_back(cleared, points);
+      ++undo_pos;
+      points.clear();
+      for(auto& rows : active_positions) {
+        std::fill(rows.begin(), rows.end(), false);
+      }
+    }
+    if(gui_state[undo()]) {
+      if(undo_pos > -1) {
+        switch(undo_vec[undo_pos].what) {
+          case added:
+            active_positions[undo_vec[undo_pos].points[0].y()]
+                            [undo_vec[undo_pos].points[0].x()] = false;
+            points.erase(points.end() - 1, points.end());
+            break;
+          case deleted:
+            active_positions[undo_vec[undo_pos].points[0].y()]
+                            [undo_vec[undo_pos].points[0].x()] = true;
+            points.push_back(undo_vec[undo_pos].points[0]);
+            break;
+          case cleared:
+            points = undo_vec[undo_pos].points;
+            for(const auto& point : points) active_positions[point.y()][point.x()] = true;
+            break;  
+        }
+        --undo_pos;
+      }
+    }
+    if(gui_state[redo()]) {
+      if(undo_pos + 1 < undo_vec.size()) {
+        switch(undo_vec[undo_pos + 1].what) {
+          case added:
+            active_positions[undo_vec[undo_pos + 1].points[0].y()]
+                            [undo_vec[undo_pos + 1].points[0].x()] = true;
+            points.push_back(undo_vec[undo_pos + 1].points[0]);
+            break;
+          case deleted:
+            active_positions[undo_vec[undo_pos + 1].points[0].y()]
+                            [undo_vec[undo_pos + 1].points[0].x()] = false;
+            points.erase(points.end() - 1, points.end());
+            break;
+          case cleared:
+            points.clear();
+            for(auto& rows : active_positions) {
+              std::fill(rows.begin(), rows.end(), false);
+            }
+            break;
+        }
+        ++undo_pos;
+      }
+    }
+
+    // UPDATE
+
+    // Get k nearest points indicies
+    auto k_near = k_nearest(points, selected, neighbors);
+    // Calculate radius for k nearest points
+    int rad = 0;
+    for(auto val : k_near) {
+      auto dist = metric(points[val], selected);
+      if(dist > rad) rad = dist;
+    }
+
+    if(undo_pos + 1 < undo_vec.size()) 
+      gui.set_text(undo_view[0](), undoable_to_string(undo_vec[undo_pos + 1]));
+    else  gui.set_text(undo_view[0](), "");
+    for(int i = 0; i < 4; ++i) {
+      gui.set_text(undo_view[i + 1](), i <= undo_pos ? undoable_to_string(undo_vec[undo_pos - i]) : "");
     }
 
     //DRAW
@@ -231,26 +393,32 @@ int main() {
     gui.draw(window);
 
     // Draw Grid
-    for(int i = 0; i < active_positions.size(); ++i) {
-      for(int j = 0; j < active_positions[i].size(); ++j) {
+    for(int i = 1; i < active_positions.size(); ++i) {
+      for(int j = 1; j < active_positions[i].size(); ++j) {
         int_box.setPosition(j * box_size + border_size, i * box_size + border_size);
         active_positions[i][j] ? int_box.setFillColor(sf::Color::Green) :
                                  int_box.setFillColor(sf::Color::Red);
-        if(metric(Point(j, i), Point(selected.x, selected.y)) == 5) 
-          int_box.setFillColor(sf::Color::Yellow);
+        if(metric(Point(j, i), selected) == rad) // TO DO : Fill in option?
+          int_box.setFillColor(active_positions[i][j] ? sf::Color::Blue : sf::Color::Yellow);
         window.draw(int_box);
       }
     }
+    // Draw k nearest points
+    for(auto val : k_near) {
+      int_box.setPosition(points[val].x() * box_size + border_size,
+                          points[val].y() * box_size + border_size);
+      int_box.setFillColor(sf::Color::Blue);
+      window.draw(int_box);
+    }
     // Draw Selected Element ( fixes border issues )
-    int_box.setPosition(selected.x * box_size + border_size, selected.y * box_size + border_size);
-    active_positions[selected.y][selected.x] ? int_box.setFillColor(sf::Color::Green) :
-                                               int_box.setFillColor(sf::Color::Red);
+    int_box.setPosition(selected.x() * box_size + border_size,selected.y() * box_size + border_size);
+    active_positions[selected.y()][selected.x()] ? 
+        int_box.setFillColor(neighbors > 0 ? sf::Color::Blue : sf::Color::Green) :
+        int_box.setFillColor(sf::Color::Red);
     int_box.setOutlineThickness(2 * border_size);
-    int_box.setOutlineColor(sf::Color::Yellow);
     window.draw(int_box);
-    int_box.setOutlineThickness(border_size);
-    int_box.setOutlineColor(sf::Color::Black);
-    
+    int_box.setOutlineThickness(0);
+
     
     window.display();
 
