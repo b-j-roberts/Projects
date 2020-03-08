@@ -41,6 +41,77 @@ public:
   } 
 };
 
+
+// TO DO : Way to pass game board to account for collisions
+template<size_t I>
+class Move {
+public:
+  // returns array of true/false according to if piece at (x, y) can move to the position on board
+  virtual std::array<std::array<bool, I>, I> moves(size_t, size_t) = 0;
+  // Stop on collision function?
+  // Kills function?
+};
+
+template<size_t I>
+class Horizontal_Move : public Move<I> {
+public:
+  std::array<std::array<bool, I>, I> moves(size_t x, size_t y) override {
+    std::array<std::array<bool, I>, I> ret;// TO DO : initialize all to false?
+    for(size_t i = 0; i < I; ++i) {
+      for(size_t j = 0; j < I; ++j) {
+        if(j == y) ret[j][i] = true;
+        else ret[j][i] = false;
+      }
+    }
+  }
+};
+
+template<size_t I>
+class Vertical_Move : public Move<I> {
+public:
+  std::array<std::array<bool, I>, I> moves(size_t x, size_t y) override {
+    std::array<std::array<bool, I>, I> ret;// TO DO : initialize all to false?
+    for(size_t i = 0; i < I; ++i) {
+      for(size_t j = 0; j < I; ++j) {
+        if(i == x) ret[j][i] = true;
+        else ret[j][i] = false;
+      }
+    }
+  }
+};
+
+template<size_t I>
+class Diagonal_Move_Positive : public Move<I> {
+public:
+  std::array<std::array<bool, I>, I> moves(size_t x, size_t y) override {
+    std::array<std::array<bool, I>, I> ret;// TO DO : initialize all to false?
+    int x_cast = static_cast<int>(x);
+    int y_cast = static_cast<int>(y);
+    for(int i = 0; i < I; ++i) {
+      for(int j = 0; j < I; ++j) {
+        if((i - x) == (-1 * (j - y))) ret[j][i] = true;
+        else ret[j][i] = false;
+      }
+    }
+  }
+};
+
+template<size_t I>
+class Diagonal_Move_Negative : public Move<I> {
+public:
+  std::array<std::array<bool, I>, I> moves(size_t x, size_t y) override {
+    std::array<std::array<bool, I>, I> ret;// TO DO : initialize all to false?
+    int x_cast = static_cast<int>(x);
+    int y_cast = static_cast<int>(y);
+    for(int i = 0; i < I; ++i) {
+      for(int j = 0; j < I; ++j) {
+        if((i - x) == (j - y)) ret[j][i] = true;
+        else ret[j][i] = false;
+      }
+    }
+  }
+};
+
 int main() {
   
   XInitThreads();
