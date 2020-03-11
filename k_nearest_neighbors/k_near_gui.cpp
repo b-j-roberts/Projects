@@ -1,5 +1,45 @@
 #include "k_near_gui.h"
 
+#include <sstream>
+#include <iomanip>
+
+static std::string Alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+template<typename T>
+std::string Undoable<T>::to_string() const {
+  if constexpr(std::is_same<T, int>()) {
+    switch(what) {
+      case added:
+        return "ADD " + Alphas.substr(points[0].y()-1, 1) + ":" + std::to_string(points[0].x());
+        break;
+      case deleted:
+        return "DEL " + Alphas.substr(points[0].y()-1, 1) + ":" + std::to_string(points[0].x());
+        break;
+      case cleared:
+        return "Cleared!";
+        break;
+    }
+  }
+  if constexpr(std::is_same<T, float>()) {
+    std::stringstream out;
+    switch(what) {
+      case added:
+        out << "ADD (" << std::fixed << std::setprecision(2) << points[0].y() / 100.f
+            << ", " << points[0].x() / 100.f << ")";
+        break;
+      case deleted:
+        out << "DEL (" << std::fixed << std::setprecision(2) << points[0].y() / 100.f
+            << ", " << points[0].x() / 100.f << ")";
+        break;
+      case cleared:
+        return "Cleared!";
+        break;
+    }
+    return out.str();
+  }
+  return "";
+}
+
 template<typename T>
 bool within_range(const sf::Vector2i& position, std::vector<std::vector<bool>>& active_positions) {
   if(std::is_same<T, int>()) {
@@ -40,16 +80,18 @@ void del_op(std::shared_ptr<Mode_State<T>> state, const sf::Vector2i& position,
       if(!active_positions[position.y][position.x]) return;
       else active_positions[position.y][position.x] = false;
     }
-    state->undo_vec.erase(state->undo_vec.begin() + state->undo_pos + 1, state->undo_vec.end());
     if constexpr(std::is_same<T, int>()) {
+      state->undo_vec.erase(state->undo_vec.begin() + state->undo_pos + 1, state->undo_vec.end());
       state->undo_vec.emplace_back(deleted, Point<int>(position.x, position.y));
       ++(state->undo_pos);
       state->points.erase(std::remove(state->points.begin(), state->points.end(),
                                       Point<int>(position.x, position.y)), state->points.end());
-    } else {
+    }
+    if constexpr(std::is_same<T, float>()) {
       Point<float> del_pos = Point<float>(position.x, position.y);
       auto idx_nearest = k_nearest<float>(state->points, del_pos, 1);
       if(!state->points.empty() && metric(del_pos, state->points[idx_nearest[0]]) < 8) {
+        state->undo_vec.erase(state->undo_vec.begin() + state->undo_pos + 1, state->undo_vec.end());
         state->undo_vec.emplace_back(deleted, *(state->points.begin()+idx_nearest[0]));
         ++(state->undo_pos);
         state->points.erase(state->points.begin()+idx_nearest[0],
@@ -129,32 +171,40 @@ void redo_op(std::shared_ptr<Mode_State<T>> state, std::vector<std::vector<bool>
 template<typename T>
 void K_Near_Gui::draw_mode(sf::RenderWindow& window, std::shared_ptr<Mode_State<T>> state,
                            size_t neighbors) const {
+  const sf::Color deactive_color = Base_Scheme.button_deactive_;
+  const sf::Color active_color = Base_Scheme.button_active_;
+  const sf::Color select_region_color = sf::Color(248, 220, 117);
+  const sf::Color nearest_color = sf::Color(0x93D9F9);
   if constexpr(std::is_same<T, int>()) {
     const size_t box_size = 50, border_size = 1; // TO DO
     sf::RectangleShape int_box(sf::Vector2f(box_size - 2 * border_size, box_size - 2 * border_size));
-    int_box.setOutlineColor(sf::Color::Yellow);
+    int_box.setOutlineColor(select_region_color);
     size_t border_count = 0, inside_count = 0;
-    // Draw Grid // TO DO : Yellow outine instead of yellow box?
     for(int i = 1; i < active_positions.size(); ++i) {
       for(int j = 1; j < active_positions[i].size(); ++j) {
         int_box.setPosition(j * box_size + border_size, i * box_size + border_size);
-        active_positions[i][j] ? int_box.setFillColor(sf::Color::Green) :
-                                 int_box.setFillColor(sf::Color::Red);
+        active_positions[i][j] ? int_box.setFillColor(active_color) :
+                                 int_box.setFillColor(deactive_color);
         int dist = metric(Point(j, i), state->selected);
-        if(dist == update_.radius) {// TO DO : Fill in option?
-          int_box.setFillColor(active_positions[i][j] ? sf::Color::Blue : sf::Color::Yellow);
-          if(active_positions[i][j]) ++border_count;
+        if(dist == update_.radius) {
+          int_box.setOutlineThickness(2 * border_size);
+          if(active_positions[i][j]) {
+            ++border_count;
+            int_box.setFillColor(nearest_color);
+          }
         } else if(dist < update_.radius) {
+          int_box.setOutlineThickness(2 * border_size);
           if(active_positions[i][j]) ++inside_count;
         }
         window.draw(int_box);
+        int_box.setOutlineThickness(0);
       }
     }
     // Draw k nearest points
     for(auto val : update_.k_near) {
       int_box.setPosition(state->points[val].x() * box_size + border_size,
                           state->points[val].y() * box_size + border_size);
-      int_box.setFillColor(sf::Color::Blue);
+      int_box.setFillColor(nearest_color);
       window.draw(int_box);
     }
     if(inside_count + border_count > neighbors) {
@@ -170,35 +220,42 @@ void K_Near_Gui::draw_mode(sf::RenderWindow& window, std::shared_ptr<Mode_State<
       int_box.setPosition(state->selected.x() * box_size + border_size,
                           state->selected.y() * box_size + border_size);
       active_positions[state->selected.y()][state->selected.x()] ?
-          int_box.setFillColor(neighbors > 0 ? sf::Color::Blue : sf::Color::Green) :
-          int_box.setFillColor(sf::Color::Red);
+          int_box.setFillColor(neighbors > 0 ? nearest_color : active_color) :
+          int_box.setFillColor(deactive_color);
       int_box.setOutlineThickness(2 * border_size);
+      int_box.setOutlineColor(active_color);
       window.draw(int_box);
       int_box.setOutlineThickness(0);
     }
   }
   if constexpr(std::is_same<T, float>()) {
     gui.set_text(popup(), "");
-    sf::CircleShape nearest_circle(update_.radius);
+    sf::CircleShape nearest_circle(update_.radius, 100);
     nearest_circle.setOrigin(update_.radius, update_.radius);
-    nearest_circle.setFillColor(sf::Color::Blue);
+    nearest_circle.setFillColor(sf::Color(0,0,0,0));
     nearest_circle.setOutlineThickness(2);
-    nearest_circle.setOutlineColor(sf::Color::Red);
+    nearest_circle.setOutlineColor(select_region_color);
     nearest_circle.setPosition(state->selected.x(), state->selected.y());
     window.draw(nearest_circle);
 
     sf::CircleShape point_shape(4);
     point_shape.setOrigin(4, 4);
-    point_shape.setFillColor(sf::Color::Green);
+    point_shape.setFillColor(active_color);
     for(const auto& point : state->points) {
       point_shape.setPosition(point.x(), point.y());
       window.draw(point_shape);
     }
+    for(auto val : update_.k_near) {
+      point_shape.setPosition(state->points[val].x(), state->points[val].y());
+      point_shape.setFillColor(nearest_color);
+      window.draw(point_shape);
+    }
     point_shape.setPosition(state->selected.x(), state->selected.y());
-    point_shape.setFillColor(sf::Color::Yellow);
+    point_shape.setFillColor(sf::Color(0,0,0,0));
+    point_shape.setOutlineThickness(1);
+    point_shape.setOutlineColor(active_color);
     window.draw(point_shape);
 
-    // TO DO : Draw nearest
   }
 }
 K_Near_Gui::K_Near_Gui(sf::RenderWindow& window, const sf::Font& font, size_t neighbors):
@@ -227,7 +284,7 @@ K_Near_Gui::K_Near_Gui(sf::RenderWindow& window, const sf::Font& font, size_t ne
   float_lhs(window, font)
   {
   //gui.add_background(Background(300, 1000, 1000, 0)); TO DO
-  Background back(300, 1000, 1000, 0);
+  Background back(300, 1000 - border_size, 1000, 0);
   gui.add_background(back);
   gui.add_linked_toggle(int_button, float_button);
   Text_Display neighbor_label(240, 50, 1030, 200, "Neighbors");
@@ -242,7 +299,7 @@ K_Near_Gui::K_Near_Gui(sf::RenderWindow& window, const sf::Font& font, size_t ne
   gui.add_text(redo_label, undo_label);
   for(auto& elem : undo_view) { gui.add_text(elem); }
   gui.set_text_color(sf::Color::Black);
-  Background int_back(1000, 1000, 0, 0, sf::Color::Black);
+  Background int_back(1000, 1300, 0, 0, sf::Color::Black);
   int_lhs.add_background(int_back);
   for(int i = 1; i < 1000 / box_size; ++i) {
     Text_Display horz_label(box_size - 2 * border_size, box_size - 2 * border_size,
@@ -264,14 +321,14 @@ K_Near_Gui::K_Near_Gui(sf::RenderWindow& window, const sf::Font& font, size_t ne
     }
   }*/
   for(int i = 0; i < 1000; i+= 100) {
-    Background tick_v(1, 10, i, 0, background);
-    Background tick_h(10, 1, 0, i, background);
+    Background tick_v(1, 10, i, 0, eggshell);
+    Background tick_h(10, 1, 0, i, eggshell);
     float_lhs.add_background(tick_v, tick_h);
     Text_Display text_v(20, 16, i, 0, std::to_string(i / 100), sf::Color(0,0,0,0));
     Text_Display text_h(20, 16, 0, i, std::to_string(i / 100), sf::Color(0,0,0,0));
     float_lhs.add_text(text_v, text_h);
   }
-  float_lhs.set_text_color(background);
+  float_lhs.set_text_color(eggshell);
 }
 
 Mode K_Near_Gui::mode() const {
@@ -301,7 +358,6 @@ void K_Near_Gui::update_mode(sf::RenderWindow& window, std::shared_ptr<Mode_Stat
   if(gui_state[clear()]) clr_op<T>(state, active_positions);
   if(gui_state[undo()]) undo_op<T>(state, active_positions);
   if(gui_state[redo()]) redo_op<T>(state, active_positions);
-//  update_ = update_state<T>(state, active_positions, neighbors, gui, undo_view);
   update_.k_near = k_nearest(state->points, state->selected, neighbors);
   update_.radius = 0;
   for(auto val : update_.k_near) {
@@ -341,4 +397,3 @@ void K_Near_Gui::draw(sf::RenderWindow& window,
   }
   gui.draw(window);
 }
-

@@ -1,3 +1,4 @@
+//#include "Harmony/sfml/gui/gui.h"
 #include <SFML/Graphics.hpp>
 
 #include <iostream> // Debug
@@ -35,7 +36,7 @@ class Point {
     const int x_offset = rand() % (rand_scale * 2) - rand_scale;
     const int y_offset = rand() % (rand_scale * 2) - rand_scale; 
 
-    if(dist(x_offset + x_, y_offset + y_, x, y) < distance) return true;
+    if(pow(x_offset + x_ - x, 2) + pow(y_offset + y_ - y, 2) < pow(distance, 2)) return true;
     else return false;
 
   }
@@ -169,20 +170,20 @@ int main() {
 // Window
   sf::VideoMode desktop = sf::VideoMode().getDesktopMode();
   sf::RenderWindow window(desktop, "Move Away!");
-
   window.setFramerateLimit(60);
 
   //Window Size & Scale
   const sf::Vector2u window_size(window.getSize());
   const float x_scale(window_size.x * 1.f / window_size.y);
-  width = window_size.x;
+  width = window_size.y;
   height = window_size.y;
   bound_x_high = width;
   bound_y_high = height;
 
 
+
 // Create points
-  const size_t num_of_points = 1000;
+  const size_t num_of_points = 10000;
 
   std::vector<Point> points;
   for(size_t i = 0; i < num_of_points; ++i) {

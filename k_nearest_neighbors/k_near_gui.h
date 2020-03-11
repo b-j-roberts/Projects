@@ -12,52 +12,17 @@
 
 #include <memory> // shared_ptr
 
-#include <sstream>
-#include <iomanip>
-
-const std::string Alphas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // TO DO
-
 enum undo_type { added, deleted, cleared };
+
 template<typename T>
 struct Undoable {
   undo_type what;
   std::vector<Point<T>> points;
-  Undoable(undo_type w, Point<T> p): what(w), points(1, p) { }
-  Undoable(undo_type w, std::vector<Point<T>> vec_p): what(w), points(vec_p) { }
+  Undoable(undo_type w, const Point<T>& p): what(w), points(1, p) { }
+  Undoable(undo_type w, const std::vector<Point<T>>& vec_p): what(w), points(vec_p) { }
 
-  std::string to_string() {
-    if constexpr(std::is_same<T, int>()) {
-      switch(what) {
-        case added:
-          return "ADD " + Alphas.substr(points[0].y()-1, 1) + ":" + std::to_string(points[0].x());
-          break;
-        case deleted:
-          return "DEL " + Alphas.substr(points[0].y()-1, 1) + ":" + std::to_string(points[0].x());
-          break;
-        case cleared:
-          return "Cleared!";
-          break;
-      }
-    }
-    if constexpr(std::is_same<T, float>()) {
-      std::stringstream out;
-      switch(what) {
-        case added:
-          out << "ADD (" << std::fixed << std::setprecision(2) << points[0].y() / 100.f
-              << ", " << points[0].x() / 100.f << ")";
-          break;
-        case deleted:
-          out << "DEL (" << std::fixed << std::setprecision(2) << points[0].y() / 100.f
-              << ", " << points[0].x() / 100.f << ")";
-          break;
-        case cleared:
-          return "Cleared!";
-          break;
-      }
-      return out.str();
-    }
-    return "";
-  }
+  // Return string based text for undo / redo Text_Display based on Undoable's state
+  std::string to_string() const;
 };
 
 enum Mode { int_ = 0, float_, none_ };
@@ -84,7 +49,7 @@ std::shared_ptr<Mode_State<T>> state_cast(std::shared_ptr<Mode_Base> base) {
 class K_Near_Gui {
   // RHS GUI 
   mutable Gui gui;
-  const sf::Color background = sf::Color(240, 234, 214, 255); // eggshell
+  const sf::Color eggshell = sf::Color(240, 234, 214, 255); // eggshell
   const sf::Color undo_view_color = sf::Color(133, 133, 133); // slight grey
   Toggle_Button int_button;
   Toggle_Button float_button;
@@ -134,28 +99,5 @@ public:
   // params : window, state_map, neighbors
   void draw(sf::RenderWindow&, const std::map<Mode, std::shared_ptr<Mode_Base>>&, size_t) const;
 };
-/*
-template<typename T>
-update_info update_state(std::shared_ptr<Mode_State<T>> state,
-                         std::vector<std::vector<bool>>& active_positions,
-                         size_t neighbors, Gui& gui, const std::array<Text_Display, 5>& undo_view) {
-    // Get k nearest points indicies
-    update_info ret{k_nearest(state->points, state->selected, neighbors)};
-    // Calculate radius for k nearest points
-    int rad = 0;
-    for(auto val : ret.k_near) {
-      auto dist = metric(state->points[val], state->selected);
-      if(dist > rad) rad = dist;
-    }
-    ret.radius = rad;
-    if(state->undo_pos + 1 < state->undo_vec.size())
-      gui.set_text(undo_view[0](), state->undo_vec[state->undo_pos + 1].to_string());
-    else  gui.set_text(undo_view[0](), "");
-    for(int i = 0; i < 4; ++i) {
-      gui.set_text(undo_view[i + 1](),
-                   i <= state->undo_pos ? state->undo_vec[state->undo_pos - i].to_string() : "");
-    }
-    return ret;
-}*/
 
 #endif

@@ -1,8 +1,0 @@
-have 2 options, int and float
-  float option has free space to place pts (between some specified bound)
-  int option has grid with each box representing a point
-
-can obtain k nearest to a point in vector or to some passed point
-
-TO DO :
-  Introduce graphics loop and GUI (float/int, index/point, k, labels & prediction)
