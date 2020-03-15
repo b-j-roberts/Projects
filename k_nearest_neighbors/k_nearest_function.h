@@ -59,6 +59,8 @@ template<typename T>
 std::vector<int> k_nearest(const std::vector<Point<T>>& points, const Point<T>& point, size_t k) {
   // Group distances btw points & point with vector index of points then sort by distance
   std::vector<pos_holder<T>> pos;
+  // OPTIMIZE : sqrt is increasing function on domain so doing metric on float is kinda wasting
+  //            computational power for this part since k_nearest will have lowest metric sqared too
   std::transform(points.begin(), points.end(), std::back_inserter(pos),
                  [&, i = 0](const auto& p) mutable { return pos_holder<T>(metric(point, p), i++); });
   // OPTIMIZE : Partial sort?

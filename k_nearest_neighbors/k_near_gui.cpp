@@ -168,6 +168,80 @@ void redo_op(std::shared_ptr<Mode_State<T>> state, std::vector<std::vector<bool>
     ++(state->undo_pos);
   }
 }
+
+K_Near_Gui::K_Near_Gui(sf::RenderWindow& window, const sf::Font& font, size_t neighbors):
+  gui(window, font),
+  int_button(120, 100, 1030, 50, "INT", true),
+  float_button(120, 100, 1150, 50, "FLOAT"),
+  k_value(140, 100, 1080, 250, std::to_string(neighbors),
+          Base_Scheme.background_ * sf::Color(200, 200, 200)),
+  popup(1300, 24, 0, 1000, ""),
+  k_decrease(50, 100, 1030, 250, "<"),
+  k_increase(50, 100, 1220, 250, ">"),
+  add_mode(70, 70, 1030, 450, "ADD"),
+  del_mode(70, 70, 1115, 450, "DEL"),
+  sel_mode(70, 70, 1030, 570, "SEL"),
+  undo(70, 70, 1200, 450, "UNDO"),
+  redo(70, 70, 1200, 570, "REDO"),
+  clear(70, 70, 1114, 570, "CLR"),
+  undo_view({ Text_Display(240, 50, 1030, 680, "", undo_view_color * sf::Color(0, 0, 0, 150)),
+              Text_Display(240, 50, 1030, 760, "", undo_view_color),
+              Text_Display(240, 50, 1030, 820, "", undo_view_color),
+              Text_Display(240, 50, 1030, 880, "", undo_view_color),
+              Text_Display(240, 50, 1030, 940, "", undo_view_color) }),
+  int_lhs(window, font),
+  active_positions(1000 / box_size, std::vector<bool>(1000 / box_size, false)),
+  int_box(sf::Vector2f(box_size - 2 * border_size, box_size - 2 * border_size)),
+  float_lhs(window, font)
+  {
+  gui.add_background(Background(300, 1000 - border_size, 1000, 0));
+  // Neighbors interface
+  gui.add_text(Text_Display(240, 50, 1030, 200, "Neighbors"), k_value, popup);
+  gui.add_push_button(k_decrease, k_increase);
+  // Mode and Buttons
+  gui.add_linked_toggle(int_button, float_button);
+  gui.add_linked_toggle(add_mode, del_mode);
+  gui.add_toggle_button(sel_mode);
+  gui.add_push_button(undo, redo, clear);
+  // Undo & Redo Views
+  gui.add_text(Text_Display(240, 20, 1030, 660, "Redo"),
+               Text_Display(240, 20, 1030, 740, "Undo"));
+  for(auto& elem : undo_view) { gui.add_text(elem); }
+  gui.set_text_color(sf::Color::Black);
+  // LHS gui setup ( int - labels & float - ticks)
+  int_lhs.add_background(Background(1000, 1300, 0, 0, sf::Color::Black));
+  for(int i = 1; i < 1000 / box_size; ++i) {
+    int_lhs.add_text(Text_Display(box_size - 2 * border_size, box_size - 2 * border_size,
+                                  i * box_size + border_size, border_size, std::to_string(i)), 
+                     Text_Display(box_size - 2 * border_size, box_size - 2 * border_size,
+                                  border_size, i * box_size + border_size, Alphas.substr(i - 1, 1)));
+  }
+  int_lhs.add_text(Text_Display(box_size - 2 * border_size, box_size - 2 * border_size,
+                                border_size, border_size, ""));
+  /* TO DO : Only after implimenting GUI lock features
+  std::vector<std::vector<Toggle_Button>> int_positions(1000 / box_size);
+  for(size_t i = 1; i < 1000 / box_size; ++i) {
+    for(size_t j = 1; j < 1000 / box_size; ++j) {
+      int_positions[i].emplace_back(box_size - 2 * border_size, box_size - 2 * border_size,
+                            j * box_size + border_size, i * box_size + border_size, "");
+      int_lhs.add_toggle_button(*(int_positions[i].end()-1));
+    }
+  }*/
+  // 
+  for(int i = 0; i < 1000; i+= 100) {
+    float_lhs.add_background(Background(1, 10, i, 0, eggshell), Background(10, 1, 0, i, eggshell));
+    float_lhs.add_text(Text_Display(20, 16, i, 0, std::to_string(i / 100), sf::Color(0,0,0,0)),
+                       Text_Display(20, 16, 0, i, std::to_string(i / 100), sf::Color(0,0,0,0)));
+  }
+  float_lhs.set_text_color(eggshell);
+}
+
+Mode K_Near_Gui::mode() const {
+  if(gui_state.at(int_button())) return int_;
+  else if(gui_state.at(float_button())) return float_;
+  else return none_;
+}
+
 template<typename T>
 void K_Near_Gui::draw_mode(sf::RenderWindow& window, std::shared_ptr<Mode_State<T>> state,
                            size_t neighbors) const {
@@ -257,84 +331,6 @@ void K_Near_Gui::draw_mode(sf::RenderWindow& window, std::shared_ptr<Mode_State<
     window.draw(point_shape);
 
   }
-}
-K_Near_Gui::K_Near_Gui(sf::RenderWindow& window, const sf::Font& font, size_t neighbors):
-  gui(window, font),
-  int_button(120, 100, 1030, 50, "INT", true),
-  float_button(120, 100, 1150, 50, "FLOAT"),
-  k_value(140, 100, 1080, 250, std::to_string(neighbors),
-          Base_Scheme.background_ * sf::Color(200, 200, 200)),
-  popup(1300, 24, 0, 1000, ""),
-  k_decrease(50, 100, 1030, 250, "<"),
-  k_increase(50, 100, 1220, 250, ">"),
-  add_mode(70, 70, 1030, 450, "ADD"),
-  del_mode(70, 70, 1115, 450, "DEL"),
-  sel_mode(70, 70, 1030, 570, "SEL"),
-  undo(70, 70, 1200, 450, "UNDO"),
-  redo(70, 70, 1200, 570, "REDO"),
-  clear(70, 70, 1114, 570, "CLR"),
-  undo_view({ Text_Display(240, 50, 1030, 680, "", undo_view_color * sf::Color(0, 0, 0, 150)),
-              Text_Display(240, 50, 1030, 760, "", undo_view_color),
-              Text_Display(240, 50, 1030, 820, "", undo_view_color),
-              Text_Display(240, 50, 1030, 880, "", undo_view_color),
-              Text_Display(240, 50, 1030, 940, "", undo_view_color) }),
-  int_lhs(window, font),
-  active_positions(1000 / box_size, std::vector<bool>(1000 / box_size, false)),
-  int_box(sf::Vector2f(box_size - 2 * border_size, box_size - 2 * border_size)),
-  float_lhs(window, font)
-  {
-  //gui.add_background(Background(300, 1000, 1000, 0)); TO DO
-  Background back(300, 1000 - border_size, 1000, 0);
-  gui.add_background(back);
-  gui.add_linked_toggle(int_button, float_button);
-  Text_Display neighbor_label(240, 50, 1030, 200, "Neighbors");
-  gui.add_text(neighbor_label, k_value, popup);
-  gui.add_push_button(k_decrease, k_increase);
-  gui.add_linked_toggle(add_mode, del_mode);
-  gui.add_toggle_button(sel_mode);
-  gui.add_push_button(undo, redo, clear);
-  sf::Color undo_view_color(133, 133, 133);
-  Text_Display redo_label(240, 20, 1030, 660, "Redo");
-  Text_Display undo_label(240, 20, 1030, 740, "Undo");
-  gui.add_text(redo_label, undo_label);
-  for(auto& elem : undo_view) { gui.add_text(elem); }
-  gui.set_text_color(sf::Color::Black);
-  Background int_back(1000, 1300, 0, 0, sf::Color::Black);
-  int_lhs.add_background(int_back);
-  for(int i = 1; i < 1000 / box_size; ++i) {
-    Text_Display horz_label(box_size - 2 * border_size, box_size - 2 * border_size,
-                            i * box_size + border_size, border_size, std::to_string(i));
-    Text_Display vert_label(box_size - 2 * border_size, box_size - 2 * border_size,
-                            border_size, i * box_size + border_size, Alphas.substr(i - 1, 1));
-    int_lhs.add_text(horz_label, vert_label);
-  }
-  Text_Display tl_block(box_size - 2 * border_size, box_size - 2 * border_size,
-                        border_size, border_size, "");
-  int_lhs.add_text(tl_block);
-  /* TO DO : Only after implimenting GUI lock features
-  std::vector<std::vector<Toggle_Button>> int_positions(1000 / box_size);
-  for(size_t i = 1; i < 1000 / box_size; ++i) {
-    for(size_t j = 1; j < 1000 / box_size; ++j) {
-      int_positions[i].emplace_back(box_size - 2 * border_size, box_size - 2 * border_size,
-                            j * box_size + border_size, i * box_size + border_size, "");
-      int_lhs.add_toggle_button(*(int_positions[i].end()-1));
-    }
-  }*/
-  for(int i = 0; i < 1000; i+= 100) {
-    Background tick_v(1, 10, i, 0, eggshell);
-    Background tick_h(10, 1, 0, i, eggshell);
-    float_lhs.add_background(tick_v, tick_h);
-    Text_Display text_v(20, 16, i, 0, std::to_string(i / 100), sf::Color(0,0,0,0));
-    Text_Display text_h(20, 16, 0, i, std::to_string(i / 100), sf::Color(0,0,0,0));
-    float_lhs.add_text(text_v, text_h);
-  }
-  float_lhs.set_text_color(eggshell);
-}
-
-Mode K_Near_Gui::mode() const {
-  if(gui_state.at(int_button())) return int_;
-  else if(gui_state.at(float_button())) return float_;
-  else return none_;
 }
 
 template<typename T>
