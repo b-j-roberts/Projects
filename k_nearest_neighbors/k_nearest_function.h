@@ -6,6 +6,7 @@
 
 #include <algorithm> // min, transform, sort
 #include <iterator> // back_inserter
+// TO DO : Import size_t?
 
 // 2D point class with label
 template<typename T, typename L = std::string>
@@ -21,15 +22,14 @@ public:
   Point(): x_(), y_() { }
   Point(T x, T y): x_(x), y_(y) { }
   Point(T x, T y, L label): x_(x), y_(y), label_(label) { }
-
   Point(const Point& p) { x_ = p.x_; y_ = p.y_; }
-  Point& operator= (const Point& p) { x_ = p.x_; y_ = p.y_; }
+  Point& operator= (const Point& p) { x_ = p.x_; y_ = p.y_; return *this; }
 
   const T x() const { return x_; } 
   const T y() const { return y_; }
   const L& label() const { return label_; }
 
-  void move(T x, T y) { x_ += x; y_ += y; };
+  void move(T x, T y) { x_ += x; y_ += y; }
 
   template<typename U>
   friend bool operator==(const Point<U>& p_1, const Point<U>& p_2);
@@ -51,25 +51,26 @@ template<typename T>
 struct pos_holder {
   T value;
   size_t pos;
-  pos_holder(T val, int i): value(val), pos(i) { }
+  pos_holder(T val, size_t i): value(val), pos(i) { }
 };
 
 // k_nearest returns a vector of the index of the 'k' nearest points to 'point' in 'points'
 template<typename T>
-std::vector<int> k_nearest(const std::vector<Point<T>>& points, const Point<T>& point, size_t k) {
-  // Group distances btw points & point with vector index of points then sort by distance
+std::vector<size_t> k_nearest(const std::vector<Point<T>>& points, const Point<T>& point, size_t k) {
+  // Group distances btw 'points' & 'point' with vector index in 'points' then sort by distance
   std::vector<pos_holder<T>> pos;
   // OPTIMIZE : sqrt is increasing function on domain so doing metric on float is kinda wasting
   //            computational power for this part since k_nearest will have lowest metric sqared too
+  size_t i = 0;
   std::transform(points.begin(), points.end(), std::back_inserter(pos),
-                 [&, i = 0](const auto& p) mutable { return pos_holder<T>(metric(point, p), i++); });
+                 [&](const auto& p) { return pos_holder<T>(metric(point, p), i++); });
   // OPTIMIZE : Partial sort?
   std::sort(pos.begin(), pos.end(), [](const pos_holder<T>& a, const pos_holder<T>& b) -> bool {
     return a.value < b.value;
   });
 
   // Take k closest values and return the index of them
-  std::vector<int> ret;
+  std::vector<size_t> ret;
   std::transform(pos.begin(), pos.begin() + std::min(k, pos.size()), std::back_inserter(ret),
                  [](const auto& holder){ return holder.pos; });
   return ret;
@@ -78,6 +79,7 @@ std::vector<int> k_nearest(const std::vector<Point<T>>& points, const Point<T>& 
 // Same as other k_nearest (see above) but for a point inside of the vector at position 'idx'
 template<typename T>
 std::vector<int> k_nearest(const std::vector<Point<T>>& points, size_t idx, size_t k) {
+  // Get k + 1 nearest & remove one passed in
   auto ret = k_nearest(points, points[idx], k + 1);
   ret.erase(std::remove(ret.begin(), ret.end(), idx), ret.end());
   return ret;

@@ -13,19 +13,27 @@ class Point {
   float vel_x_, vel_y_;
   float acc_x_, acc_y_;
 
+  float mass_;
   float charge_;
 
-  sf::CircleShape visual_;
+  mutable sf::CircleShape visual_;
 
 public:
 
-  Point(int width, int height);
+  Point() = default;
+  Point(int, int, float, float, float, float);
+  Point(const Point&) = default;
+  Point& operator=(const Point&) = default;
+  // TO DO : More
+  
+  float x() const { return x_; }
+  float y() const { return y_; }
 
   void push_from(const Point&);
-  void update(int width, int height);
-  void draw(sf::RenderWindow& window) const { window.draw(visual_); }
+  void update(size_t width, size_t height);
+  void draw(sf::RenderWindow& window) const; 
 };
-
+/*
 class Source {
 
   float x_, y_;
@@ -41,5 +49,5 @@ public:
 
   //friend void Point::push_from(const Source&);
 };
-
+*/
 #endif

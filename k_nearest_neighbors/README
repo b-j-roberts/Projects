@@ -18,6 +18,12 @@ k_nearest_gui/k_nearest_gui.h ( & .cpp )
 ------------
 No known issues
 
+Many implicit conversion & comparison warnings generated with clang++ -Weverything, but these are all
+safe based on constrains in code ( however still fix these at some point, key : Change undo_pos to 
+size_t of some iterator type )
+
+Check out vtable warning, dont fully understand this as of now : -Wweak-vtables
+
 
 ** Ideas **
 -----------

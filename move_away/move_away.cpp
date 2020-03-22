@@ -1,13 +1,13 @@
 #include "move_away_gui.h"
 
-#include <cstdio> // NULL
+//#include <cstdio> // NULL
 #include <ctime> // time
 
 int main() {
 
   XInitThreads();
 
-  srand(time(NULL));
+  srand(time(nullptr));
 
   // window
   const sf::Vector2u window_size(1300, 1000);
@@ -22,12 +22,7 @@ int main() {
 
   Move_Away_Gui gui(window, window_size, font);
 
-  //const size_t amount = 1500; // MAX
-  const size_t amount = 400;
   std::vector<Point> points;
-  for(size_t i = 0; i < amount; ++i) {
-    points.emplace_back(static_cast<int>(window_size.y), static_cast<int>(window_size.y));
-  }
   /*std::vector<Source> sources;
   for(size_t i = 0; i < 10; ++i) {
     sources.emplace_back(rand() % window_size.y, rand() % window_size.y, rand() % 11 - 5);
@@ -42,12 +37,13 @@ int main() {
         case sf::Event::Closed:
           window.close();
           break;
-        default: break;
+        default:
+          break;
       }
     } // end event loop
 
     // UPDATE
-    gui.update(window_size, points);
+    gui.update(window, points);
 
     // DRAW
     window.clear();
