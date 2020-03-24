@@ -43,7 +43,7 @@ Harmony SFML lib
 
   make
 
-ie. C++17 & uses Harmony's libharmony-basic.a
+ie. C++17 & uses Harmony's libharmony-sfml.a
 NOTE : Change -I directory to location of Harmony dir & Change -L directory to inside Harmony dir
 
 

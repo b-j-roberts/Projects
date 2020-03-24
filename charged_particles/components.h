@@ -3,10 +3,10 @@
 
 #include "Harmony/sfml/gui/gui.h"
 
-#include <cstdlib> // srand, rand
+// TO DO : Take frame rate into account
 
-class Source;
-
+// A charged and massed point with an interface for being repelled/attracted by other points
+// Sort of emulates a charged point in space 
 class Point {
 
   float x_, y_;
@@ -21,33 +21,20 @@ class Point {
 public:
 
   Point() = default;
+  // params : pos_x, pos_y, vel_x, vel_y, mass, charge
   Point(int, int, float, float, float, float);
   Point(const Point&) = default;
   Point& operator=(const Point&) = default;
-  // TO DO : More
   
   float x() const { return x_; }
   float y() const { return y_; }
 
+  // Apply force from point passed; build up x & y acc  
   void push_from(const Point&);
+  // Update x_, y_, vel_x_, vel_y_ from acc calculated; apply Friction; & reset acc
   void update(size_t width, size_t height);
+  // Draw visual_ to window with cloning for seemless overflow graphics
   void draw(sf::RenderWindow& window) const; 
 };
-/*
-class Source {
 
-  float x_, y_;
-
-  float charge_;
-
-  sf::CircleShape visual_;
-
-public:
-
-  Source(float x, float y, float charge);
-  void draw(sf::RenderWindow& window) const { window.draw(visual_); }
-
-  //friend void Point::push_from(const Source&);
-};
-*/
 #endif

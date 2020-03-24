@@ -1,8 +1,8 @@
-#include "move_away_gui.h"
+#include "charged_particles_gui.h"
 #include <iostream>
 
 #include <cstdlib> // rand
-#include <limits> // numeric limits
+#include <limits> // numeric_limits<float>
 
 // Function alias for chrono's duration_cast<milliseconds>
 template <typename... Args>
@@ -12,16 +12,16 @@ auto duration_ms(Args&&... args) ->
 }
 
 Gui_Stat_Block::Gui_Stat_Block(float val, float min_v, float max_v, size_t y_pos,
-                               const sf::Vector2u& rhs_gui_size, size_t left_margin,
+                               size_t rhs_width, size_t left_margin,
                                Gui& gui, const std::string& label):
   value(val),
   min_val(min_v),
   max_val(max_v),
-  display(rhs_gui_size.x * 2 / 5, 100, left_margin, y_pos, ""/*TO DO*/, sf::Color(160, 160, 160)),
-  up(20, 45, left_margin + rhs_gui_size.x * 2 / 5 + 5, y_pos, "^"),
-  down(20, 45, left_margin + rhs_gui_size.x * 2 / 5 + 5, y_pos + 55, "V"), 
-  random(rhs_gui_size.x * 2 / 5 - 30, 100, left_margin + rhs_gui_size.x * 2 / 5 + 30, y_pos, "RAND") {
-  gui.add_text(display, Text_Display(rhs_gui_size.x * 4 / 5, 20, left_margin, y_pos - 20, label));
+  display(rhs_width * 2 / 5, 100, left_margin, y_pos, "", sf::Color(160, 160, 160)),
+  up(20, 45, left_margin + rhs_width * 2 / 5 + 5, y_pos, "^"),
+  down(20, 45, left_margin + rhs_width * 2 / 5 + 5, y_pos + 55, "V"), 
+  random(rhs_width * 2 / 5 - 30, 100, left_margin + rhs_width * 2 / 5 + 30, y_pos, "RAND") {
+  gui.add_text(display, Text_Display(rhs_width * 4 / 5, 20, left_margin, y_pos - 20, label));
   gui.add_push_button(up, down);
   gui.add_toggle_button(random);
 }
@@ -43,15 +43,15 @@ bool Gui_Stat_Block::active_id(size_t id, Gui& gui) {
 }
 
 bool Gui_Stat_Block::deactive_id(size_t id, Gui& gui) {
-  if(id == random.id()) {
+  if(id == random.id()) { // Display value if not RND
     gui.set_text(display.id(), std::to_string(value).substr(0,3 + (value < 0)));
     return true;
   }
   return false;
 }
 
-Move_Away_Gui::Move_Away_Gui(sf::RenderWindow& window, const sf::Vector2u& window_size,
-                             const sf::Font& font):
+Charged_Particle_Gui::Charged_Particle_Gui(sf::RenderWindow& window, const sf::Vector2u& window_size,
+                                           const sf::Font& font):
   rhs_gui_size(window_size.x - window_size.y, window_size.y),
   left_margin(rhs_gui_size.x / 10 + rhs_gui_size.y),
   button_width(rhs_gui_size.x * 4 / 5),
@@ -61,29 +61,29 @@ Move_Away_Gui::Move_Away_Gui(sf::RenderWindow& window, const sf::Vector2u& windo
   del_point(button_width, 100, left_margin, 200, "DEL"),
   poke(button_width, 100, left_margin, 310, "POKE"),
   pause(button_width / 4, 50, left_margin, 10, "||"),
-  vel_x_block(0.f, -3.f, 3.f, 450, rhs_gui_size, left_margin, gui, "VELOCITY X"),
-  vel_y_block(0.f, -3.f, 3.f, 580, rhs_gui_size, left_margin, gui, "VELOCITY Y"),
-  mass_block(1.f, 1.f, 3.f, 710, rhs_gui_size, left_margin, gui, "MASS"),
-  charge_block(0.f, -3.f, 3.f, 840, rhs_gui_size, left_margin, gui, "CHARGE") {
-  // TO DO : Backgrounds drawing in wrong direction
+  vel_x_block(0.f, -3.f, 3.f, 450, rhs_gui_size.x, left_margin, gui, "VELOCITY X"),
+  vel_y_block(0.f, -3.f, 3.f, 580, rhs_gui_size.x, left_margin, gui, "VELOCITY Y"),
+  mass_block(1.f, 1.f, 3.f, 710, rhs_gui_size.x, left_margin, gui, "MASS"),
+  charge_block(0.f, -3.f, 3.f, 840, rhs_gui_size.x, left_margin, gui, "CHARGE") {
   gui.add_background(Background(rhs_gui_size.x, rhs_gui_size.y, rhs_gui_size.y, 0));
   gui.add_text(fps);
   gui.add_linked_toggle(add_point, del_point, poke);
   gui.add_toggle_button(pause);
 }
 
-void Move_Away_Gui::update(sf::RenderWindow& window, std::vector<Point>& points) {
+void Charged_Particle_Gui::update(sf::RenderWindow& window, std::vector<Point>& points) {
 
   const sf::Vector2u& window_size = window.getSize(); // TO DO : Error on resize?
 
   auto state = gui.get_state();
   
-  Point poke_point;
+  Point poke_point; // The point representing where one is pressing in Poke mode
+  // Loop through all states, then depending on val ( active / deactive ) do action based on id
   for(const auto& [id, val] : state) {
     if(val) { // GUI - Code interation if state is true
 
       if(id == add_point.id() && sf::Mouse::isButtonPressed(sf::Mouse::Left)) { 
-        if(clicked) { // TO DO
+        if(clicked) { // do click sensativity
           if(duration_ms(std::chrono::steady_clock::now() - last_click) > click_sensitive_dur) {
             clicked = false;
           }
@@ -98,10 +98,9 @@ void Move_Away_Gui::update(sf::RenderWindow& window, std::vector<Point>& points)
                                 mass_block.get_value(), charge_block.get_value());
           }
         }
-      }
-      else if(id == del_point.id() && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+      } else if(id == del_point.id() && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         // TO DO : Drag delete?
-        if(clicked) {
+        if(clicked) { // do click sensativity
           if(duration_ms(std::chrono::steady_clock::now() - last_click) > click_sensitive_dur) {
             clicked = false;
           }
@@ -124,18 +123,14 @@ void Move_Away_Gui::update(sf::RenderWindow& window, std::vector<Point>& points)
             ++current_pos;
           }
           // If minimum square distance is less than minimum square radius then delete that point
-          if(min_sq_dist < sq(10)) { // TO DO
+          if(min_sq_dist < sq(10)) { // TO DO : Change radius to be same as point
             points.erase(points.begin() + closest_pos, points.begin() + closest_pos + 1);
           }
         }
-      }
-      else if(id == poke.id() && sf::Mouse::isButtonPressed(sf::Mouse::Left)) { 
+      } else if(id == poke.id() && sf::Mouse::isButtonPressed(sf::Mouse::Left)) { 
         if(state[pause.id()]) continue;
         const auto& click = sf::Mouse::getPosition(window);
         poke_point = Point(click.x, click.y, 0, 0, mass_block.get_value(), charge_block.get_value());
-      }
-      else if(id == pause.id()) {
-        // TO DO : I want to do anything?
       }
       else if(vel_x_block.active_id(id, gui)) { }
       else if(vel_y_block.active_id(id, gui)) { }

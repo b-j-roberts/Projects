@@ -1,7 +1,7 @@
-#include "move_away_gui.h"
+#include "charged_particles_gui.h"
 
-//#include <cstdio> // NULL
 #include <ctime> // time
+#include <cstdlib> // srand
 
 int main() {
 
@@ -11,7 +11,7 @@ int main() {
 
   // window
   const sf::Vector2u window_size(1300, 1000);
-  sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "Move Away!");
+  sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "Charged Particles");
   window.setFramerateLimit(60);
 
   sf::Font font;
@@ -20,13 +20,9 @@ int main() {
                              " found!");
   }
 
-  Move_Away_Gui gui(window, window_size, font);
+  Charged_Particle_Gui gui(window, window_size, font);
 
   std::vector<Point> points;
-  /*std::vector<Source> sources;
-  for(size_t i = 0; i < 10; ++i) {
-    sources.emplace_back(rand() % window_size.y, rand() % window_size.y, rand() % 11 - 5);
-  }*/
 
   sf::Event event;
   while(window.isOpen()) {
@@ -48,12 +44,10 @@ int main() {
     // DRAW
     window.clear();
     for(const auto& point : points) point.draw(window);
-    //for(const auto& source : sources) source.draw(window);
     gui.draw(window);
     window.display();
     
   } // end game loop
 
   return 0;
-
 }
