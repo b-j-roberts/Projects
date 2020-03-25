@@ -2,7 +2,7 @@
 *
 *
 *  Project Directory by Brandon Roberts
-*  Version 0.00 Update: A new beginning
+*  Version 0.03 Update: Notecards Release
 *
 *
 ***********************************************************
@@ -11,11 +11,29 @@
 --------------
 
 * Project Euler - Mathematical Practice Problems ( https://projecteuler.net/ ) 
+                  location : "project_euler/"
+
+* K Nearest Neighbors - Interactive Visualizer of k-nearest neighbors algorithm for different metrics
+                        currently l1 ( city block - int ) & l2 ( euclidean - float ) metrics
+                        location : "k_nearest_neighbors/"
+
+* Charged Particle Simulator - Interactive Visualizer of charged & massed particles in torus space
+                               location : "charged_particles/"
+
+* Notecards App - Application that loads arbitrarily many flashcards from a file
+                  each card with arbitrarily many faces
+                  location : "notecards/"
+
+* incomplete - chess
+
+NOTE : Each project directory has its own README that explains its repective project  in more detail
+
 
 ** READ **
 ----------
-This directory contains small-ish one off projects that can be used
-  as resume material and practice in languages and skills.
+This directory contains small-ish one off projects that have been used as practice, entertainment,
+and testing for Harmony library.
+
 
 ** IDEAS **
 -----------
