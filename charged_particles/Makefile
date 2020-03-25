@@ -2,7 +2,7 @@ COMPILER := clang++
 CLANG_WARNS := -Weverything -Wextra -Wno-c++98-compat -Wno-padded -Wno-global-constructors -Wno-switch-enum -Wno-shorten-64-to-32
 
 VERSION := -std=c++1z
-FLAGS := -O3 -fPIC -ggdb
+FLAGS := -O3 -fPIC
 INC := -I ~/workspace/
 
 LINKS := -pthread -lX11 -L ~/workspace/Harmony/ -lharmony-sfml -lsfml-graphics -lsfml-window -lsfml-system

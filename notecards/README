@@ -1,0 +1,69 @@
+**********************************************************
+*
+*
+*   Notecards by Brandon Roberts
+*   Version 1.0 Update : Release!
+*
+*
+**********************************************************
+
+** Contains **
+--------------
+notecards/notecards.cpp ( w/ int main() )
+notecards/components.h ( & .cpp )
+notecards/notecards_gui.h ( & .cpp )
+
+
+** Issues **
+------------
+No known Issues
+
+
+** Ideas **
+-----------
+TO\ DO in code
+
+
+** Dependencies **
+------------------
+SFML
+X11 (Xinitthreads)
+Harmony SFML lib
+Harmony Basic lib ( argparser )
+
+
+** Compiling **
+---------------
+
+make
+
+ie. C++20 & uses Harmony's libharmony-sfml.a & libharmony-basic.a
+NOTE: Change 'INC' & 'LINK' fields in Makefile depending n harmony library location
+
+
+** READ **
+----------
+
+This is a flashcard study platform that takes a file as input & loads a deck of flashcards from it
+Flashcards can have arbitrarily many faces & there can be arbitrarily many flashcards
+
+Progress bar displayed on bottom of screen
+
+TO USE :
+  ./notecards -f <notecards file path>
+
+  in <notecards file path>:
+    
+    card1 face1,card1 face2,card1 face3, ...
+    card2 face1,card2 face2,card2 face3, ...
+    .
+    .
+    .
+
+  NOTE: The notecards file is loaded into a wstring so any character type should work ( UTF8 )
+
+Interface:
+  FLIP - flips card face
+  NEXT - goes to next card
+  REM - removes card from deck
+  RESET - resets deck to original state on load ( put all cards back )
