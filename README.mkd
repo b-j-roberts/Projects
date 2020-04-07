@@ -53,19 +53,28 @@ This mode has the same actions and responsiveness as Int mode!
 
 ---
 ### Charged Particle Simulator - Interactive ( *./charged_particles/* )
-Interactive Visualizer of chared & massed particles in Torus Space ( NOTE : Particles have no collision )
+Interactive Visualizer of charged & massed particles in Torus Space ( NOTE : Particles have no collision )
 
-// TO DO : Gifs
+
+Red ( negative ) & Blue ( positive ) particles interact; The attractions and motions loop back around making the interactions in torus space.
+![DEMO VIDEO](https://github.com/b-j-roberts/Projects/raw/master/demos/charged_particles/charge_miniclip.gif)
+
+You can insert objects at random ( random entry velocity, mass, and charge )
+![RANDOM INTERACTIONS](https://github.com/b-j-roberts/Projects/raw/master/demos/charged_particles/random_charged_screencap.gif)
+
+Or you can pause the simulation and meticulously place things where you want with whatever properties desired ( within their limits )
+![INTERACTIONS](https://github.com/b-j-roberts/Projects/raw/master/demos/charged_particles/explosion_charged_screencap.gif)
+
+NOTE : You see how the particles ( because of connected torus space and uniform charge ) create a nice lattice structure very quickly ( before the Blue one come in )!
 
 ---
 ### Notecards App ( *./notecards/* )
-Application that loads arbitarily many flashcards, each with arbitrarily many faces, from a file
+Application that loads arbitarily many flashcards, each with arbitrarily many faces, from a file. ( Progress bar on the bottom )
 
 After loading it allows you to flip faces, go to random cards & remove cards from deck ( to study like flashcards )
 
-I personally love using it for Japanese cards, so I can have one face for Kanji, one for Hiragana, and one english
-
-// TO DO : Gifs
+I personally love using it for Japanese cards, so I can have one face for Kanji, one for Hiragana, and one english.
+![DEMO VIDEO](https://github.com/b-j-roberts/Projects/raw/master/demos/notecards/notecard_demo_screencap.gif)
 
 ---
 ### Incomplete
