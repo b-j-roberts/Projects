@@ -8,6 +8,8 @@ This repo contains small-ish one off projects that I have used as practice, ente
 
 #### NOTE: Each project has its own README.mkd for more specific details on that project
 
+#### NOTE: Most projects are using `Harmony` in some way, primarily most of the gui elements are part of `Harmony/sfml/gui/gui.h`
+
 ---
 ### Project Euler Problems ( *./project_euler/* )
 Set of Mathematical Practice Coding Problems from [Project Euler Site](https://projecteuler.net/)
@@ -85,9 +87,16 @@ I personally love using it for Japanese cards, so I can have one face for Kanji,
 ### Incomplete
 * Chess ( *./chess/* )
 
+
+---
+### TO DO
+* README for each individual project
+* Mention `Harmony/sfml/gui/gui.h` in overall note
+
 ---
 ### Future Ideas
 * Sudoku
+* UML Diagram Drawer ( after this : code generation from UML ? )
 * Emoji Based Programming language
 * Sort Algorithm Visualizer
 * Recursive Shapes Creator

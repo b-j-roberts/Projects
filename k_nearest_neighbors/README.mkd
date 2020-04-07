@@ -1,0 +1,75 @@
+# K-Nearest Neighbors Visualizer
+### v1.0 -- Release
+##### Visualize and Interact with different metrics finding the k-nearest points to specified positions
+##### by Brandon Roberts
+
+---
+
+### Contains
+* k\_nearest\_neighbors/k-nearest.cpp ( w/ int main() )
+* k\_nearest\_neighbors/k\_nearest\_functions.h ( & .cpp )
+* k\_nearest\_gui/k\_nearest\_gui.h ( & .cpp )
+
+---
+
+### Issues & Ideas
+* No known Issues
+* Many implicit conversion & comparison warnings generated with clang++ -Weverything, but these are all 
+  safe based on constrains in code ( however still fix these at some point, key : Change undo\_pos to 
+  size\_t of some iterator type )
+* Check out vtable warning, I dont fully understand this as of now. `Wweak-vtables`
+* Search: `TO\ DO` in code
+* Implement full labeling system
+
+---
+
+### Dependencies
+* C++17
+* Harmony SFML library ( *libharmony-sfml.a* ) -- For **Gui**
+  * SFML
+  * X11
+  
+#### NOTE : Use `make` to compile from source
+
+#### NOTE : May need to change `LINK` and `INC` fields in `Makefile` to correspond to your `Harmony` lib location
+
+---
+
+### MORE INFO :
+
+#### NOTE : The following is a copy from the overall `Projects/README.mkd` demonstrating use of the system
+
+Currently:
+
+* **L1** or *City Block / Int*
+* **L2** or *Euclidean / Float* Metrics
+
+#### INT MODE :
+There are buttons to add, delete, and clear selected points, you can also undo / redo these operations!
+
+![ADD/DELETE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_mode_screencap.gif)
+![UNDO/REDO/CLR SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_undo_redo_screencap.gif)
+
+After inserting points you can select a point and the number of nearest neighbors to highlight ( using **L1** Norm ).
+NOTE: It can highlight more if many share the max neighbors distance.
+
+![SELECTING SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_selecting_screencap.gif)
+![SELECTING SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_selecting_screencap_2.gif)
+
+The GUI interface is a combination of `Harmony/sfml/gui/gui.h` and custom **SFML** elements. It is very quick and responsive.
+
+![RESPONSIVE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_responsive_screencap.gif)
+
+#### FLOAT MODE :
+There is also a Float mode that uses **L2** Norm & floating point positioning!
+
+![FLOAT MODE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/float_mode_screencap.gif)
+
+This mode has the same actions and responsiveness as Int mode!
+
+![SELECTING SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/float_select_screencap.gif)
+![RESPONSIVE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/float_responsive_screencap.gif)
+
+##### There is also persistence when switching between modes!
+
+![PERSISTENCE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/mode_persistence_screencap.gif)

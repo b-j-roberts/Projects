@@ -1,0 +1,56 @@
+# Charged Particle Simulator
+### v1.0 -- Release
+##### Simulates point mass-charges which do not collide in Torus Space
+##### by Brandon Roberts
+
+---
+
+### Contains
+* charged\_particles/charged-particles.cpp ( w/ int main() )
+* charged\_particles/components.h ( & .cpp )
+* charged\_particles/charged\_particles\_gui.h ( & .cpp )
+
+---
+
+### Issues & Ideas
+* No known Issues
+* Search: `TO\ DO` in code
+* Some kind of visual for poke mode?
+* Slider for changing constants? Such as attraction constant ( 20.f )
+
+---
+
+### Dependencies
+* C++17
+* Harmony SFML library ( *libharmony-sfml.a* ) -- For **Gui**
+  * SFML
+  * X11
+
+#### NOTE : Use `make` to compile from source
+
+#### NOTE : May need to change `LINK` and `INC` fields in `Makefile` to correspond to your `Harmony` lib location
+
+---
+
+### MORE INFO :
+
+#### NOTE : The following diagram describes how I used modulus operations to 'fold' the space into torus space. ( Quotient space in mathematics )
+
+<img src="https://github.com/b-j-roberts/Projects/raw/master/demos/charged_particles/torus_img.png" alt="TORUS QUOTIENT" width="800" height="450"/>
+
+#### NOTE : The following is a copy from the overall `Projects/README.mkd` demonstrating use of the system
+
+Red ( negative ) & Blue ( positive ) particles interact; The attractions and motions loop back around making the interactions in torus space.
+
+![DEMO VIDEO](https://github.com/b-j-roberts/Projects/raw/master/demos/charged_particles/charge_miniclip.gif)
+
+You can insert objects at random ( random entry velocity, mass, and charge )
+
+![RANDOM INTERACTIONS](https://github.com/b-j-roberts/Projects/raw/master/demos/charged_particles/random_charged_screencap.gif)
+
+Or you can pause the simulation and meticulously place things where you want with whatever properties desired ( within their limits )
+
+![INTERACTIONS](https://github.com/b-j-roberts/Projects/raw/master/demos/charged_particles/explosion_charged_screencap.gif)
+
+NOTE : Poke mode creates a point charge, that cannot be seen, with selected properties exactly where clicking with the mouse
+NOTE : You see how the particles ( because of connected torus space and uniform charge ) create a nice lattice structure very quickly ( before the Blue one come in )!
