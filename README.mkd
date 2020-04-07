@@ -3,6 +3,7 @@
 ##### Small-ish Self-Contained Test & Practice Projects
 This repo contains small-ish one off projects that I have used as practice, entertainment, and idea testing for Harmony library.
 
+---
 ## The Projects
 
 #### NOTE: Each project has its own README.mkd for more specific details on that project
@@ -23,7 +24,7 @@ Currently:
 #### INT MODE :
 There are buttons to add, delete, and clear selected points, you can also undo / redo these operations!
 
-![ADD/DELETE SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/int_mode_screencap.gif)
+![ADD/DELETE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_mode_screencap.gif)
 ![UNDO/REDO/CLR SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/int_undo_redo_screencap.gif)
 
 After inserting points you can select a point and the number of nearest neighbors to highlight ( using **L1** Norm ). 
