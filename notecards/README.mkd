@@ -8,7 +8,7 @@
 ### Contains
 * `notecards/notecards.cpp` ( w/ int main() )
 * `notecards/components.h` ( & .cpp )
-* `notecards/notecards\_gui.h` ( & .cpp )
+* `notecards/notecards_gui.h` ( & .cpp )
 
 ---
 

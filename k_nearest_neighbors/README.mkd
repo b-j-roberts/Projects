@@ -6,9 +6,9 @@
 ---
 
 ### Contains
-* `k\_nearest\_neighbors/k-nearest.cpp` ( w/ int main() )
-* `k\_nearest\_neighbors/k\_nearest\_functions.h` ( & .cpp )
-* `k\_nearest\_gui/k\_nearest\_gui.h` ( & .cpp )
+* `k_nearest_neighbors/k-nearest.cpp` ( w/ int main() )
+* `k_nearest_neighbors/k_nearest_functions.h` ( & .cpp )
+* `k_nearest_gui/k_nearest_gui.h` ( & .cpp )
 
 ---
 
