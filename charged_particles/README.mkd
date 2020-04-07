@@ -6,9 +6,9 @@
 ---
 
 ### Contains
-* charged\_particles/charged-particles.cpp ( w/ int main() )
-* charged\_particles/components.h ( & .cpp )
-* charged\_particles/charged\_particles\_gui.h ( & .cpp )
+* `charged\_particles/charged-particles.cpp` ( w/ int main() )
+* `charged\_particles/components.h` ( & .cpp )
+* `charged\_particles/charged\_particles\_gui.h` ( & .cpp )
 
 ---
 
