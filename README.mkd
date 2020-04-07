@@ -25,31 +25,31 @@ Currently:
 There are buttons to add, delete, and clear selected points, you can also undo / redo these operations!
 
 ![ADD/DELETE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_mode_screencap.gif)
-![UNDO/REDO/CLR SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/int_undo_redo_screencap.gif)
+![UNDO/REDO/CLR SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_undo_redo_screencap.gif)
 
 After inserting points you can select a point and the number of nearest neighbors to highlight ( using **L1** Norm ). 
 NOTE: It can highlight more if many share the max neighbors distance.
 
-![SELECTING SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/int_selecting_screencap.gif)
-![SELECTING SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/int_selecting_screencap_2.gif)
+![SELECTING SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_selecting_screencap.gif)
+![SELECTING SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_selecting_screencap_2.gif)
 
 The GUI interface is a combination of `Harmony/sfml/gui/gui.h` and custom **SFML** elements. It is very quick and responsive.
 
-![RESPONSIVE SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/int_responsive_screencap.gif)
+![RESPONSIVE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/int_responsive_screencap.gif)
 
 #### FLOAT MODE :
 There is also a Float mode that uses **L2** Norm & floating point positioning!
 
-![FLOAT MODE SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/float_mode_screencap.gif)
+![FLOAT MODE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/float_mode_screencap.gif)
 
 This mode has the same actions and responsiveness as Int mode!
 
-![SELECTING SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/float_select_screencap.gif)
-![RESPONSIVE SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/float_responsive_screencap.gif)
+![SELECTING SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/float_select_screencap.gif)
+![RESPONSIVE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/float_responsive_screencap.gif)
 
 ##### There is also persistence when switching between modes!
 
-![PERSISTENCE SCREENCAP](https://github.com/b-j-roberts/Projects/tree/master/demos/k_nearest_neighbors/mode_persistence_screencap.gif)
+![PERSISTENCE SCREENCAP](https://github.com/b-j-roberts/Projects/raw/master/demos/k_nearest_neighbors/mode_persistence_screencap.gif)
 
 ---
 ### Charged Particle Simulator - Interactive ( *./charged_particles/* )
