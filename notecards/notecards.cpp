@@ -29,8 +29,8 @@ int main(int argc, char** argv) {
   // Setup fonts
   constexpr size_t num_of_fonts = 2; // TO DO
   std::vector<sf::Font> font_vec(num_of_fonts);
-  const std::array<std::string, num_of_fonts> font_paths({"/usr/share/fonts/umeboshi_.ttf",
-                                                          "/usr/share/fonts/KosugiMaru-Regular.ttf"});
+  const std::array<std::string, num_of_fonts> font_paths({"./fonts/umeboshi_.ttf",
+                                                          "./fonts/KosugiMaru-Regular.ttf"});
   for(size_t inc = 0; const auto& path : font_paths) {
     if(!font_vec[inc].loadFromFile(path)) {
       throw std::runtime_error("No def file : " + path + " found!");
@@ -40,9 +40,10 @@ int main(int argc, char** argv) {
 
   // Load Deck
   std::ifstream deck_file(parser.get<std::string>("file"));
-  // TO DO : Error checking on file
+  if(!deck_file.is_open()) { throw std::runtime_error("Error opening file : " + parser.get<std::string>("file")); }
   Deck original_deck(deck_file);
   Deck current_deck(original_deck);
+  deck_file.close();
 
   // GUI
   Notecards_Gui gui(window, window_size, font_vec, current_deck);

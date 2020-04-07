@@ -16,7 +16,7 @@ notecards/notecards_gui.h ( & .cpp )
 
 ** Issues **
 ------------
-Need to move fonts into this folder
+Crashes if you press flip when deck is empty
 
 
 ** Ideas **
