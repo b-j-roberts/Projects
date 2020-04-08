@@ -37,8 +37,6 @@
 
 ### MORE INFO :
 
-#### NOTE : The following is a copy from the overall `Projects/README.mkd` demonstrating use of the system
-
 Currently:
 
 * **L1** or *City Block / Int*
