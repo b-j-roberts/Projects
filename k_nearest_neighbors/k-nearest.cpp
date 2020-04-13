@@ -18,7 +18,7 @@ int main() {
   window.setFramerateLimit(60);
 
   sf::Font font;
-  if(!font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf")) {
+  if(!font.loadFromFile("../rsc/fonts/FreeMonoBold.ttf")) {
     throw std::runtime_error("No font file :""/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf"
                              " found!");
   }
