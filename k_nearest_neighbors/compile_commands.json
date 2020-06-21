@@ -1,0 +1,41 @@
+[
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-std=c++1z",
+            "-O3",
+            "-I",
+            "/home/brandon/workspace/",
+            "k_near_gui.cpp"
+        ],
+        "directory": "/home/brandon/workspace/Projects/k_nearest_neighbors",
+        "file": "k_near_gui.cpp"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-std=c++1z",
+            "-O3",
+            "-I",
+            "/home/brandon/workspace/",
+            "k-nearest.cpp"
+        ],
+        "directory": "/home/brandon/workspace/Projects/k_nearest_neighbors",
+        "file": "k-nearest.cpp"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-std=c++1z",
+            "-O3",
+            "-I",
+            "/home/brandon/workspace/",
+            "k_nearest_function.cpp"
+        ],
+        "directory": "/home/brandon/workspace/Projects/k_nearest_neighbors",
+        "file": "k_nearest_function.cpp"
+    }
+]

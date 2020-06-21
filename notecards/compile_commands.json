@@ -1,0 +1,74 @@
+[
+    {
+        "arguments": [
+            "clang++-9",
+            "-c",
+            "-I",
+            "/home/brandon/workspace/",
+            "-std=c++2a",
+            "-Weverything",
+            "-Wextra",
+            "-Wno-c++98-compat",
+            "-Wno-padded",
+            "-Wno-switch-enum",
+            "-Wno-shorten-64-to-32",
+            "-Wno-weak-vtables",
+            "-Wno-global-constructors",
+            "-Wno-missing-prototypes",
+            "-Wno-exit-time-destructors",
+            "-o",
+            "notecards_gui.o",
+            "notecards_gui.cpp"
+        ],
+        "directory": "/home/brandon/workspace/Projects/notecards",
+        "file": "notecards_gui.cpp"
+    },
+    {
+        "arguments": [
+            "clang++-9",
+            "-c",
+            "-I",
+            "/home/brandon/workspace/",
+            "-std=c++2a",
+            "-Weverything",
+            "-Wextra",
+            "-Wno-c++98-compat",
+            "-Wno-padded",
+            "-Wno-switch-enum",
+            "-Wno-shorten-64-to-32",
+            "-Wno-weak-vtables",
+            "-Wno-global-constructors",
+            "-Wno-missing-prototypes",
+            "-Wno-exit-time-destructors",
+            "-o",
+            "components.o",
+            "components.cpp"
+        ],
+        "directory": "/home/brandon/workspace/Projects/notecards",
+        "file": "components.cpp"
+    },
+    {
+        "arguments": [
+            "clang++-9",
+            "-c",
+            "-I",
+            "/home/brandon/workspace/",
+            "-std=c++2a",
+            "-Weverything",
+            "-Wextra",
+            "-Wno-c++98-compat",
+            "-Wno-padded",
+            "-Wno-switch-enum",
+            "-Wno-shorten-64-to-32",
+            "-Wno-weak-vtables",
+            "-Wno-global-constructors",
+            "-Wno-missing-prototypes",
+            "-Wno-exit-time-destructors",
+            "-o",
+            "notecards.o",
+            "notecards.cpp"
+        ],
+        "directory": "/home/brandon/workspace/Projects/notecards",
+        "file": "notecards.cpp"
+    }
+]

@@ -1,0 +1,65 @@
+[
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-std=c++1z",
+            "-O3",
+            "-fPIC",
+            "-I",
+            "/home/brandon/workspace/",
+            "-Weverything",
+            "-Wextra",
+            "-Wno-c++98-compat",
+            "-Wno-padded",
+            "-Wno-global-constructors",
+            "-Wno-switch-enum",
+            "-Wno-shorten-64-to-32",
+            "components.cpp"
+        ],
+        "directory": "/home/brandon/workspace/Projects/charged_particles",
+        "file": "components.cpp"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-std=c++1z",
+            "-O3",
+            "-fPIC",
+            "-I",
+            "/home/brandon/workspace/",
+            "-Weverything",
+            "-Wextra",
+            "-Wno-c++98-compat",
+            "-Wno-padded",
+            "-Wno-global-constructors",
+            "-Wno-switch-enum",
+            "-Wno-shorten-64-to-32",
+            "charged-particles.cpp"
+        ],
+        "directory": "/home/brandon/workspace/Projects/charged_particles",
+        "file": "charged-particles.cpp"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-std=c++1z",
+            "-O3",
+            "-fPIC",
+            "-I",
+            "/home/brandon/workspace/",
+            "-Weverything",
+            "-Wextra",
+            "-Wno-c++98-compat",
+            "-Wno-padded",
+            "-Wno-global-constructors",
+            "-Wno-switch-enum",
+            "-Wno-shorten-64-to-32",
+            "charged_particles_gui.cpp"
+        ],
+        "directory": "/home/brandon/workspace/Projects/charged_particles",
+        "file": "charged_particles_gui.cpp"
+    }
+]
