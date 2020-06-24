@@ -3,7 +3,7 @@
 #include <cmath> // sqrt, abs
 
 Point::Point(int pos_x, int pos_y, float vel_x, float vel_y, float mass, float charge):
-  x_(pos_x), y_(pos_y),
+  x_(static_cast<float>(pos_x)), y_(static_cast<float>(pos_y)),
   vel_x_(vel_x), vel_y_(vel_y),
   acc_x_(0), acc_y_(0),
   mass_(mass),
@@ -44,7 +44,7 @@ void Point::push_from(const Point& point) {
   acc_y_ += (force / mass_) * (y_dist) / dist;
 }
 
-void Point::update(size_t width, size_t height) {
+void Point::update(float width, float height) {
   // Update velocity
   vel_x_ += acc_x_;
   vel_y_ += acc_y_;

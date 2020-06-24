@@ -35,8 +35,8 @@ bool Gui_Stat_Block::active_id(size_t id, Gui& gui) {
     return true;
   } else if(id == random.id()) { // Choose random value in range
     gui.set_text(display.id(), "RND");
-    value = static_cast<float>((rand() % static_cast<int>((max_val - min_val) * 10 + 1)) + 
-                               min_val * 10) / 10.f;
+    value = (static_cast<float>(rand() % static_cast<int>((max_val - min_val) * 10 + 1)) + 
+                                min_val * 10) / 10.f;
     return true;
   }
   return false;
@@ -111,7 +111,8 @@ void Charged_Particle_Gui::update(sf::RenderWindow& window, std::vector<Point>& 
           const auto& click = sf::Mouse::getPosition(window);
           // Compute minimum square distance to a Point in 'points' and its position
           auto sq = [](auto val){ return val * val; };
-          auto sq_dist = [&](const Point& p){ return sq(p.x() - click.x) + sq(p.y() - click.y); };
+          auto sq_dist = [&](const Point& p){ return sq(p.x() - static_cast<float>(click.x)) + 
+                                                     sq(p.y() - static_cast<float>(click.y)); };
           float min_sq_dist = std::numeric_limits<float>::max();
           long closest_pos = 0, current_pos = 0;
           for(const auto& p : points) {
@@ -149,7 +150,8 @@ void Charged_Particle_Gui::update(sf::RenderWindow& window, std::vector<Point>& 
   if(!state[pause.id()]) {
     for(const auto& p : points) for(auto& point : points) point.push_from(p);
     if(state[poke.id()]) { for(auto& point : points) point.push_from(poke_point); }
-    for(auto& point : points) point.update(window_size.y, window_size.y);
+    for(auto& point : points) point.update(static_cast<float>(window_size.y), 
+                                           static_cast<float>(window_size.y));
   }
 
   // fps

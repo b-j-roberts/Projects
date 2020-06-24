@@ -32,7 +32,7 @@ public:
   // Apply force from point passed; build up x & y acc  
   void push_from(const Point&);
   // Update x_, y_, vel_x_, vel_y_ from acc calculated; apply Friction; & reset acc
-  void update(size_t width, size_t height);
+  void update(float width, float height);
   // Draw visual_ to window with cloning for seemless overflow graphics
   void draw(sf::RenderWindow& window) const; 
 };
