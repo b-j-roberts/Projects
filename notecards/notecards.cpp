@@ -56,10 +56,9 @@ int main(int argc, char** argv) {
     while(window.pollEvent(event)) {
       switch(event.type) {
 
-        case sf::Event::KeyPressed:
-          case sf::Event::Closed:
-            window.close();
-            break;
+        case sf::Event::Closed:
+          window.close();
+          break;
 
         default: break;
       }
