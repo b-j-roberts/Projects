@@ -14,6 +14,7 @@ class Card {
 public:
   // Constuct faces_ by splitting wstring on delim
   explicit Card(const std::wstring&, char delim = ',');
+  size_t size() const { return faces_.size(); }
   const std::wstring& get_face(size_t n) const { return faces_[n % faces_.size()]; }
 };
 

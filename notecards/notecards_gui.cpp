@@ -58,8 +58,8 @@ void Notecards_Gui::set_text(const std::wstring& text) {
 }
 
 void Notecards_Gui::next_card(const Deck& deck) {
-  face_idx = 0;
   card_idx = static_cast<unsigned long>(rand()) % deck.size();
+  face_idx = static_cast<unsigned long>(rand()) % deck.get_card(card_idx).size();
   font_idx = static_cast<unsigned long>(rand()) % fonts_.size();
   set_text(deck.get_card(card_idx).get_face(face_idx));
 }
