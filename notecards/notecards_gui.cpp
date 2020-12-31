@@ -28,24 +28,24 @@ Notecards_Gui::Notecards_Gui(sf::RenderWindow& window, const sf::Vector2u& windo
                              const std::vector<sf::Font>& fonts, const Deck& deck):
   gui_(window, fonts[0]), // TO DO : If no fonts?
   fonts_(fonts),
-  rhs_width(window_size.x - window_size.y),
+  rhs_width(window_size.x / 4),
   button_width(static_cast<size_t>(rhs_width * .9)),
-  start(window_size.y + (rhs_width - button_width) / 2, window_size.y / 3),
+  start(rhs_width * 3 + (rhs_width - button_width) / 2, window_size.y / 3),
   flip(button_width, 100, start.x, start.y, "FLIP"),
   next(button_width, 100, start.x, start.y + 120, "NEXT"),
   rem(button_width / 2 - 5, 100, start.x, start.y + 240, "REM"),
   reset(button_width / 2 - 5, 100, start.x + button_width / 2 + 5, start.y + 240, "RES"),
   card_idx(static_cast<unsigned long>(rand()) % deck.size()),
   font_idx(static_cast<unsigned long>(rand()) % fonts_.size()),
-  card(sf::Vector2f(window_size.x / 2, window_size.y / 2)) {
+  card(sf::Vector2f(rhs_width * 3 - 10, 3* window_size.y / 5)) {
   // setup card
-  card.setPosition(sf::Vector2f(window_size.x / 8, window_size.y / 5));
+  card.setPosition(sf::Vector2f(5, window_size.y / 5));
   card.setFillColor(sf::Color(200, 200, 200));
   card_text.setFillColor(sf::Color(30, 30, 30));
   next_card(deck);
   // Add overall background, rhs background, and card shadow
-  gui_.add_background(Background(window_size.y, window_size.y, 0, 0, sf::Color(100, 100, 100)),
-                      Background(rhs_width, window_size.y, window_size.y, 0),
+  gui_.add_background(Background(rhs_width * 3, window_size.y, 0, 0, sf::Color(100, 100, 100)),
+                      Background(rhs_width, window_size.y, rhs_width * 3, 0),
                       Background(window_size.x / 2, window_size.y / 2, window_size.x / 8 + 20,
                                  window_size.y / 5 + 20, sf::Color(30, 30, 30, 30)));
   gui_.add_push_button(flip, next, rem, reset);

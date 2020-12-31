@@ -21,7 +21,8 @@ int main(int argc, char** argv) {
   parser.add_argument<std::string>("-f","--file","This is the csv notecard file", true);
 
   // Setup window
-  sf::RenderWindow window(sf::VideoMode(1300, 1000), "NOTECARDS");
+  //sf::RenderWindow window(sf::VideoMode(1300, 1000), "NOTECARDS");
+  sf::RenderWindow window(sf::VideoMode(1920, 1080), "NOTECARDS");
   window.setFramerateLimit(60);
   const sf::Vector2u window_size(window.getSize());
   //const float x_scale(window_size.x * 1.f / window_size.y);
