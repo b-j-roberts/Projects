@@ -1,4 +1,5 @@
 #include "components.h"
+#include <iostream>
 
 // Convert const char* to std::wstring ( using UTF8 characters )
 // from : http://www.cplusplus.com/forum/general/31270/
@@ -75,9 +76,26 @@ void Deck::remove_card(size_t n) {
   }
 }
 
-Deck::Deck(std::ifstream& stream) {
+Deck::Deck(std::ifstream& stream, int numberOfCards) {
   std::string line;
+  std::vector<Card> newCards;
   while(std::getline(stream, line)) {
-    cards_.emplace_back(to_Wstring(line.c_str()));
+    newCards.emplace_back(to_Wstring(line.c_str()));
   }
+
+  int m = newCards.size() > numberOfCards ? numberOfCards : newCards.size();
+  // Find m unique random numbers
+  std::vector<int> random_positions;
+  for(int i = 0; i < m; ++i) {
+     int r;
+     do {
+        r = rand() % newCards.size();
+     } while(std::count(random_positions.begin(), random_positions.end(), r));
+     random_positions.push_back(r); 
+  }
+
+  for(int i = 0; i < random_positions.size(); ++i) {
+    cards_.push_back(newCards[random_positions[i]]);
+  }
+
 }

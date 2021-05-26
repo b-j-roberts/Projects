@@ -19,6 +19,8 @@ int main(int argc, char** argv) {
   // Setup Parser
   Parser parser(argc, argv, "Notecards application accepting a csv file for notecards");
   parser.add_argument<std::string>("-f","--file","This is the csv notecard file", true);
+  // TO DO : Make this not required and just have a default
+  parser.add_argument<int>("-n","--num","The number of vocab card to put in deck", true);
 
   // Setup window
   //sf::RenderWindow window(sf::VideoMode(1300, 1000), "NOTECARDS");
@@ -42,7 +44,7 @@ int main(int argc, char** argv) {
   // Load Deck
   std::ifstream deck_file(parser.get<std::string>("file"));
   if(!deck_file.is_open()) { throw std::runtime_error("Error opening file : " + parser.get<std::string>("file")); }
-  Deck original_deck(deck_file);
+  Deck original_deck(deck_file, parser.get<int>("num"));
   Deck current_deck(original_deck);
   deck_file.close();
 
