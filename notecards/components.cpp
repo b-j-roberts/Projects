@@ -1,5 +1,6 @@
 #include "components.h"
 #include <iostream>
+#include <algorithm>
 
 // Convert const char* to std::wstring ( using UTF8 characters )
 // from : http://www.cplusplus.com/forum/general/31270/

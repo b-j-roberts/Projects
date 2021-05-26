@@ -1,11 +1,11 @@
-COMPILER := gcc
+COMPILER := clang++-9
 CLANG_WARNS := -Wextra -Wno-c++98-compat -Wno-padded -Wno-switch-enum -Wno-shorten-64-to-32 -Wno-weak-vtables -Wno-global-constructors -Wno-missing-prototypes -Wno-exit-time-destructors
 
 VERSION := -std=c++2a
 FLAGS := -O3 -ggdb
 INC := -I ~/workspace/
 
-LINKS := -pthread -lX11 -L ~/workspace/Harmony -lharmony-sfml -lharmony-basic -lsfml-graphics -lsfml-window -lsfml-system -lpthread -lstdc++
+LINKS := -pthread -lX11 -L ~/workspace/Harmony -lharmony-sfml -lharmony-basic -lsfml-graphics -lsfml-window -lsfml-system -lpthread
 
 notecards: notecards.o notecards_gui.o components.o notecards_gui.h
 	${COMPILER} notecards.o notecards_gui.o components.o -o notecards ${FLAGS} ${LINKS}
