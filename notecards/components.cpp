@@ -77,11 +77,14 @@ void Deck::remove_card(size_t n) {
   }
 }
 
-Deck::Deck(std::ifstream& stream, int numberOfCards) {
+Deck::Deck(std::ifstream& stream, int numberOfCards, int start, int end) {
   std::string line;
   std::vector<Card> newCards;
+  int idx = 0;
   while(std::getline(stream, line)) {
-    newCards.emplace_back(to_Wstring(line.c_str()));
+    if(start <= idx) newCards.emplace_back(to_Wstring(line.c_str()));
+    idx++;
+    if(end != -1 && idx >= end) break;
   }
 
   int m = newCards.size() > numberOfCards ? numberOfCards : newCards.size();

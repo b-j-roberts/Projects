@@ -21,6 +21,8 @@ int main(int argc, char** argv) {
   parser.add_argument<std::string>("-f","--file","This is the csv notecard file", true);
   // TO DO : Make this not required and just have a default
   parser.add_argument<int>("-n","--num","The number of vocab card to put in deck", true);
+  parser.add_argument<int>("-s","--start","Index to start from in file", false);
+  parser.add_argument<int>("-e","--end","Index to end with in file", false);
 
   // Setup window
   //sf::RenderWindow window(sf::VideoMode(1300, 1000), "NOTECARDS");
@@ -42,9 +44,14 @@ int main(int argc, char** argv) {
   }
 
   // Load Deck
+  int start = 0;
+  if(parser.has("start")) start = parser.get<int>("start");
+  int end = -1;
+  if(parser.has("end")) end = parser.get<int>("end");
+  if(end!=-1 && end - start < parser.get<int>("num")) throw std::runtime_error("Not enough in start - end range for number of cards");
   std::ifstream deck_file(parser.get<std::string>("file"));
   if(!deck_file.is_open()) { throw std::runtime_error("Error opening file : " + parser.get<std::string>("file")); }
-  Deck original_deck(deck_file, parser.get<int>("num"));
+  Deck original_deck(deck_file, parser.get<int>("num"), start, end);
   Deck current_deck(original_deck);
   deck_file.close();
 

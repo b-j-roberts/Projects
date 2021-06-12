@@ -58,6 +58,7 @@ void Notecards_Gui::set_text(const std::wstring& text) {
 }
 
 void Notecards_Gui::next_card(const Deck& deck) {
+  if(deck.size() == 0) return;
   card_idx = static_cast<unsigned long>(rand()) % deck.size();
   face_idx = static_cast<unsigned long>(rand()) % deck.get_card(card_idx).size();
   font_idx = static_cast<unsigned long>(rand()) % fonts_.size();
@@ -70,7 +71,7 @@ void Notecards_Gui::update(Deck& deck, const Deck& original) {
     if(val) { // GUI - Code interaction if state is true
       if(id == flip.id()) { // flip face
         ++face_idx;
-        set_text(deck.get_card(card_idx).get_face(face_idx));
+        if(deck.size() !=0) set_text(deck.get_card(card_idx).get_face(face_idx));
       } else if(id == next.id()) { // next card
         next_card(deck);
       } else if(id == rem.id()) { // remove card

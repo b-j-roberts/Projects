@@ -25,7 +25,7 @@ class Deck {
 
 public:
   // Convert file into a deck of cards_, each line corresponds to a Card ( delimited faces )
-  explicit Deck(std::ifstream&, int);
+  explicit Deck(std::ifstream&, int, int, int);
   size_t size() const { return cards_.size(); }
   const Card& get_card(size_t n) const { return cards_[n % cards_.size()]; }
   // Remove card in cards_ in position n % size
